@@ -6,13 +6,13 @@ public abstract class Stations {
 
     private String stationID;
     private String stationType;
-    private Float lat;
-    private Float lon;
+    private Double lat;
+    private Double lon;
     private Boolean is_last_station;
     private ArrayList<NextStation> next_stations;
     private ArrayList<Transfer> transfer;
 
-    public Stations(String stationID, String stationType, Float lat, Float lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
+    public Stations(String stationID, String stationType, Double lat, Double lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
         this.stationID = stationID;
         this.stationType = stationType;
         this.lat = lat;
@@ -41,7 +41,7 @@ public abstract class Stations {
 
 class BusStation extends Stations {
 
-    public BusStation(String stationID, String stationType, Float lat, Float lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
+    public BusStation(String stationID, String stationType, Double lat, Double lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
         super(stationID, stationType, lat, lon, is_last_station, next_stations, transfer);
     }
 }
@@ -49,7 +49,7 @@ class BusStation extends Stations {
 
 class TramsStation extends Stations {
 
-    public TramsStation(String stationID, String stationType, Float lat, Float lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
+    public TramsStation(String stationID, String stationType, Double lat, Double lon, Boolean is_last_station, ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
         super(stationID, stationType, lat, lon, is_last_station, next_stations, transfer);
     }
 }
@@ -58,11 +58,11 @@ class TramsStation extends Stations {
 class NextStation {
 
     private Stations stations;
-    private Float distance;
-    private Float amount;
+    private Double distance;
+    private Double amount;
     private Integer time;
 
-    public NextStation(Stations stations, Float distance, Float amount, Integer time) {
+    public NextStation(Stations stations, Double distance, Double amount, Integer time) {
         this.stations = stations;
         this.distance = distance;
         this.amount = amount;
@@ -73,10 +73,10 @@ class NextStation {
 class Transfer{
 
     private Stations transfer_station;
-    private Float transfer_amount;
+    private Double transfer_amount;
     private Integer transfer_time;
 
-    public Transfer(Stations transfer_station, Float transfer_amount, Integer transfer_time) {
+    public Transfer(Stations transfer_station, Double transfer_amount, Integer transfer_time) {
         this.transfer_station = transfer_station;
         this.transfer_amount = transfer_amount;
         this.transfer_time = transfer_time;
