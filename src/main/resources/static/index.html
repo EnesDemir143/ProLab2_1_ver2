@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultra Modern Yol Çizici</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      transition: background 0.5s ease;
+    }
+
+    body.night-mode {
+      background: linear-gradient(135deg, #1a2634, #2e3b55);
+      color: #d4d4d8;
+    }
+
+    #map {
+      height: 80vh;
+      width: 70vw;
+      float: right;
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.5s ease;
+    }
+
+    #map:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .controls-container {
+      width: 28vw;
+      float: left;
+      padding: 1rem;
+    }
+
+    .coords-display {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 69, 0, 0.8));
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      font-size: 0.9rem;
+    }
+
+    .input-field {
+      background: linear-gradient(145deg, #fff7e6, #ffe4e1);
+      box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.05), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+      border: 2px solid #ff6f61;
+      border-radius: 1rem;
+      transition: all 0.5s ease;
+    }
+
+    .night-mode .input-field {
+      background: linear-gradient(145deg, #2e3b55, #3b4a6b);
+      color: #d4d4d8;
+      border: 2px solid #8b5cf6;
+    }
+
+    .input-field:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3);
+      transform: scale(1.02);
+    }
+
+    .btn-draw, .toggle-btn, .marker-btn {
+      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      border-radius: 1.5rem;
+      transition: all 0.5s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .night-mode .btn-draw, .night-mode .toggle-btn, .night-mode .marker-btn {
+      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+    }
+
+    .btn-draw:hover, .toggle-btn:hover, .marker-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #ff6f61, #ff1493);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      border-radius: 0 0 1rem 1rem;
+    }
+
+    .night-mode .navbar {
+      background: linear-gradient(135deg, #1a2634, #2e3b55);
+    }
+
+    .nav-link {
+      color: #fff;
+      transition: all 0.4s ease;
+    }
+
+    .nav-link:hover {
+      color: #facc15;
+      transform: translateY(-3px);
+    }
+
+    /* Updated Popup Styling */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: linear-gradient(135deg, rgba(255, 245, 230, 0.95), rgba(255, 200, 220, 0.9));
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s ease;
+      border: 2px solid #ff6f61;
+      backdrop-filter: blur(10px);
+    }
+
+    .popup.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .night-mode .popup {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(55, 65, 81, 0.9));
+      border: 2px solid #8b5cf6;
+      color: #d4d4d8;
+    }
+
+    .popup h3 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .night-mode .popup h3 {
+      background: linear-gradient(45deg, #8b5cf6, #facc15);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .route-card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .night-mode .route-card {
+      background: rgba(55, 65, 81, 0.8);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .route-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .popup button {
+      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 1.5rem;
+      margin-top: 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .night-mode .popup button {
+      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+    }
+
+    .popup button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      z-index: 100;
+    }
+
+    .night-mode .mode-toggle {
+      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+    }
+
+    .dynamic-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+
+    .dynamic-section.show {
+      max-height: 200px;
+      margin-top: 0.5rem;
+    }
+
+    .marker-btn img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans antialiased overflow-x-hidden">
+<!-- Navbar -->
+<nav class="navbar text-white p-6 sticky top-0 z-20">
+  <div class="container mx-auto flex justify-between items-center max-w-7xl">
+    <h1 class="text-4xl font-bold tracking-tight bg-gradient-to-r from-yellow-400 to-pink-600 bg-clip-text text-transparent">
+      Path Recommendation System
+    </h1>
+
+
+  </div>
+</nav>
+
+<!-- Mode Toggle -->
+<div class="mode-toggle" onclick="toggleMode()">Gece Modu</div>
+
+<!-- Main Content -->
+<div class="container mx-auto px-6 py-12 flex">
+  <!-- Controls (Left Side) -->
+  <div class="controls-container">
+    <div class="bg-white night-mode:bg-gray-800 rounded-3xl shadow-xl p-4">
+      <h2 class="text-xl font-bold mb-3 text-gray-800 night-mode:text-gray-200 bg-gradient-to-r from-yellow-400 to-pink-600 bg-clip-text text-transparent">
+        Rota Planlayıcı
+      </h2>
+
+      <!-- Passenger Info -->
+      <div class="mt-4">
+        <label class="block text-base font-semibold mb-1 text-gray-700 night-mode:text-gray-300">Yolcu Türü</label>
+        <select id="passenger_type" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 text-sm" onchange="updatePassengerFields()">
+          <option value="" disabled selected>Yolcu türünü seçin</option>
+          <option value="general">Genel</option>
+          <option value="student">Öğrenci</option>
+          <option value="old">Yaşlı</option>
+        </select>
+
+        <div class="mt-4 space-y-3">
+          <input type="text" id="name_surname" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Ad Soyad">
+        </div>
+
+        <div id="student_field" class="dynamic-section">
+          <input type="text" id="student_id" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Öğrenci ID">
+        </div>
+        <div id="old_field" class="dynamic-section">
+          <input type="text" id="pass_card" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Geçiş Kartı">
+        </div>
+
+        <!-- Marker Buttons -->
+        <button class="marker-btn mt-4 w-full text-white p-3 font-semibold text-base" onclick="toggleMarker('start')">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s" alt="Start Marker"> Başlangıç Noktası
+        </button>
+        <div id="start_section" class="dynamic-section">
+          <input type="text" id="start_lat" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Başlangıç Enlem (Lat)">
+          <input type="text" id="start_lon" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Başlangıç Boylam (Lon)">
+        </div>
+
+        <button class="marker-btn mt-4 w-full text-white p-3 font-semibold text-base" onclick="toggleMarker('end')">
+          <img src="https://toppng.com/uploads/preview/finish-line-clip-art-png-11552244506xaumpwxhty.png" alt="End Marker"> Bitiş Noktası
+        </button>
+        <div id="end_section" class="dynamic-section">
+          <input type="text" id="end_lat" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Bitiş Enlem (Lat)">
+          <input type="text" id="end_lon" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Bitiş Boylam (Lon)">
+        </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="mt-4">
+        <label class="block text-base font-semibold mb-1 text-gray-700 night-mode:text-gray-300">Ödeme Yöntemi</label>
+        <select id="payment_method" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 text-sm" onchange="updatePaymentFields()">
+          <option value="" disabled selected>Ödeme yöntemi seçin</option>
+          <option value="card">Kredi Kartı</option>
+          <option value="cash">Nakit</option>
+          <option value="cityCard">Kentkart Ödeme</option>
+        </select>
+
+        <div id="card_field" class="dynamic-section">
+          <input type="text" id="card_number" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Kart Numarası">
+          <input type="text" id="card_limit" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Kart Limiti">
+        </div>
+        <div id="cash_field" class="dynamic-section">
+          <input type="text" id="cash_amount" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Nakit Miktarı">
+        </div>
+        <div id="cityCard_field" class="dynamic-section">
+          <input type="text" id="card_number2" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Kart Numarası">
+          <input type="text" id="card_balance" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Kart Bakiyesi">
+        </div>
+      </div>
+
+      <button onclick="drawRoute()" class="btn-draw mt-4 w-full text-white p-3 font-semibold text-base">Yolu Çiz</button>
+    </div>
+  </div>
+
+  <!-- Map (Right Side) -->
+  <div id="map" class="relative"></div>
+  <div id="coords" class="coords-display">Enlem: -, Boylam: -</div>
+</div>
+
+<!-- Popup -->
+<div id="routePopup" class="popup">
+  <h3>Rota Bilgileri</h3>
+  <div id="routeInfo" class="space-y-3"></div>
+  <button onclick="closePopup()">Kapat</button>
+</div>
+<div id="overlay" class="overlay" onclick="closePopup()"></div>
+
+<script>
+  function toggleMode() {
+    document.body.classList.toggle('night-mode');
+    const toggle = document.querySelector('.mode-toggle');
+    toggle.textContent = document.body.classList.contains('night-mode') ? 'Gündüz Modu' : 'Gece Modu';
+  }
+
+  function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    section.classList.toggle('show');
+  }
+
+  var stops = {{ stops|tojson|safe }};
+  var map;
+  var polylines = [];
+  var infoWindow;
+  var startMarker = null;
+  var targetMarker = null;
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 12,
+      center: {lat: 40.7669, lng: 29.9408},
+      styles: [
+        {"featureType": "water", "elementType": "geometry", "stylers": [{"color": "#87ceeb"}, {"lightness": 10}]},
+        {"featureType": "landscape", "elementType": "geometry", "stylers": [{"color": "#f0fff0"}, {"lightness": 15}]},
+        {"featureType": "road", "elementType": "geometry", "stylers": [{"color": "#ffdead"}, {"lightness": 20}]}
+      ]
+    });
+
+    infoWindow = new google.maps.InfoWindow();
+
+    stops.forEach(function(stop) {
+      var iconUrl = stop.types === 'bus' ?
+              'https://maps.google.com/mapfiles/kml/shapes/bus.png' :
+              'https://maps.google.com/mapfiles/kml/shapes/rail.png';
+      new google.maps.Marker({
+        position: {lat: stop.lat, lng: stop.lon},
+        map: map,
+        title: stop.ids,
+        icon: { url: iconUrl, scaledSize: new google.maps.Size(48, 48) }
+      });
+    });
+
+    var coordDiv = document.getElementById('coords');
+    map.addListener('mousemove', function(event) {
+      var lat = event.latLng.lat().toFixed(6);
+      var lng = event.latLng.lng().toFixed(6);
+      coordDiv.textContent = 'Enlem: ' + lat + ', Boylam: ' + lng;
+    });
+  }
+
+  function toggleMarker(type) {
+    toggleSection(type + '_section');
+    const latInput = document.getElementById(type + '_lat');
+    const lonInput = document.getElementById(type + '_lon');
+    const lat = parseFloat(latInput.value) || (type === 'start' ? 40.7669 : 40.7769);
+    const lon = parseFloat(lonInput.value) || (type === 'start' ? 29.9408 : 29.9508);
+
+    if (type === 'start') {
+      if (!startMarker) {
+        startMarker = new google.maps.Marker({
+          position: {lat: lat, lng: lon},
+          map: map,
+          draggable: true,
+          icon: { url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s', scaledSize: new google.maps.Size(48, 48) },
+          title: 'Başlangıç Noktası'
+        });
+
+        startMarker.addListener('dragend', function(event) {
+          const lat = event.latLng.lat().toFixed(6);
+          const lng = event.latLng.lng().toFixed(6);
+          document.getElementById('start_lat').value = lat;
+          document.getElementById('start_lon').value = lng;
+        });
+      } else {
+        startMarker.setMap(startMarker.getMap() ? null : map);
+      }
+    } else if (type === 'end') {
+      if (!targetMarker) {
+        targetMarker = new google.maps.Marker({
+          position: {lat: lat, lng: lon},
+          map: map,
+          draggable: true,
+          icon: { url: 'https://toppng.com/uploads/preview/finish-line-clip-art-png-11552244506xaumpwxhty.png', scaledSize: new google.maps.Size(48, 48) },
+          title: 'Hedef Noktası'
+        });
+
+        targetMarker.addListener('dragend', function(event) {
+          const lat = event.latLng.lat().toFixed(6);
+          const lng = event.latLng.lng().toFixed(6);
+          document.getElementById('end_lat').value = lat;
+          document.getElementById('end_lon').value = lng;
+        });
+      } else {
+        targetMarker.setMap(targetMarker.getMap() ? null : map);
+      }
+    }
+
+    latInput.addEventListener('input', updateMarkerPositions);
+    lonInput.addEventListener('input', updateMarkerPositions);
+  }
+
+  function updateMarkerPositions() {
+    const startLat = parseFloat(document.getElementById('start_lat').value);
+    const startLon = parseFloat(document.getElementById('start_lon').value);
+    const endLat = parseFloat(document.getElementById('end_lat').value);
+    const endLon = parseFloat(document.getElementById('end_lon').value);
+
+    if (startMarker && !isNaN(startLat) && !isNaN(startLon)) {
+      startMarker.setPosition({lat: startLat, lng: startLon});
+    }
+    if (targetMarker && !isNaN(endLat) && !isNaN(endLon)) {
+      targetMarker.setPosition({lat: endLat, lng: endLon});
+    }
+  }
+
+  function updatePassengerFields() {
+    document.getElementById('student_field').classList.remove('show');
+    document.getElementById('old_field').classList.remove('show');
+
+    const selectedType = document.getElementById('passenger_type').value;
+    if (selectedType === 'student') {
+      document.getElementById('student_field').classList.add('show');
+    } else if (selectedType === 'old') {
+      document.getElementById('old_field').classList.add('show');
+    }
+  }
+
+  function updatePaymentFields() {
+    document.getElementById('card_field').classList.remove('show');
+    document.getElementById('cash_field').classList.remove('show');
+    document.getElementById('cityCard_field').classList.remove('show');
+
+    const selectedMethod = document.getElementById('payment_method').value;
+    if (selectedMethod) {
+      document.getElementById(selectedMethod + '_field').classList.add('show');
+    }
+  }
+
+  function drawRoute() {
+    const start_lat = parseFloat(document.getElementById('start_lat').value);
+    const start_lon = parseFloat(document.getElementById('start_lon').value);
+    const end_lat = parseFloat(document.getElementById('end_lat').value);
+    const end_lon = parseFloat(document.getElementById('end_lon').value);
+
+    if (isNaN(start_lat) || isNaN(start_lon) || isNaN(end_lat) || isNaN(end_lon)) {
+      alert('Lütfen tüm koordinat alanlarına geçerli sayılar girin.');
+      return;
+    }
+
+    const passengerType = document.getElementById('passenger_type').value;
+    const nameSurname = document.getElementById('name_surname').value;
+
+    if (!passengerType || !nameSurname) {
+      alert('Lütfen yolcu türünü seçin ve geçerli bir ad soyad girin.');
+      return;
+    }
+
+    let passengers = { nameSurname: nameSurname };
+    if (passengerType === 'student') {
+      passengers.student_id = document.getElementById('student_id').value || '';
+    } else if (passengerType === 'old') {
+      passengers.passCard = document.getElementById('pass_card').value || '';
+    }
+
+    const paymentType = document.getElementById('payment_method').value;
+    let payment_method;
+    if (paymentType === 'card') {
+      payment_method = {
+        limit: parseFloat(document.getElementById('card_limit').value) || 0,
+        card_number: document.getElementById('card_number').value || ''
+      };
+    } else if (paymentType === 'cash') {
+      payment_method = { cash: parseFloat(document.getElementById('cash_amount').value) || 0 };
+    } else if (paymentType === 'cityCard') {
+      payment_method = {
+        balance: parseFloat(document.getElementById('card_balance').value) || 0,
+        card_number: document.getElementById('card_number2').value || ''
+      };
+    }
+
+    const requestData = {
+      start_location: { lat: start_lat, lon: start_lon },
+      target_location: { lat: end_lat, lon: end_lon },
+      passengers: passengers,
+      payment_method: payment_method
+    };
+
+    polylines.forEach(poly => poly.setMap(null));
+    polylines = [];
+
+    fetch('/draw_route', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.detail || 'Bilinmeyen bir hata oluştu'); });
+              }
+              return response.json();
+            })
+            .then(data => {
+              data.routes.forEach((route, index) => {
+                const path = route.path.map(coord => ({ lat: coord.lat, lng: coord.lng }));
+                const polyline = new google.maps.Polyline({
+                  path: path,
+                  geodesic: true,
+                  strokeColor: ['#ff1493', '#00ff00', '#0000ff'][index % 3],
+                  strokeOpacity: 0.9,
+                  strokeWeight: 6,
+                  map: map
+                });
+                polylines.push(polyline);
+
+                polyline.addListener('mouseover', function(event) {
+                  const content = `
+                            <div class="route-info-tooltip">
+                                <strong>Mesafe:</strong> ${route.distance} km<br>
+                                <strong>Süre:</strong> ${route.duration} dk<br>
+                                <strong>Tutar:</strong> ${route.price} TL<br>
+                                <strong>En İyi:</strong> ${route.best_for}
+                            </div>
+                        `;
+                  infoWindow.setContent(content);
+                  infoWindow.setPosition(event.latLng);
+                  infoWindow.open(map);
+                });
+
+                polyline.addListener('mouseout', function() {
+                  infoWindow.close();
+                });
+              });
+
+              map.setCenter({ lat: data.start_point.lat, lng: data.start_point.lon });
+
+              const passengerInfo = {
+                name_surname: nameSurname,
+                location: { start: { lat: start_lat, lon: start_lon }, target: { lat: end_lat, lon: end_lon } }
+              };
+              if (passengerType === 'student') passengerInfo.student_id = document.getElementById('student_id').value || '';
+              else if (passengerType === 'old') passengerInfo.pass_card = document.getElementById('pass_card').value || '';
+
+              showRouteInfo(data, passengerType, passengerInfo, paymentType, payment_method);
+            })
+            .catch(error => {
+              alert('Rota çizilirken bir hata oluştu: ' + error.message);
+            });
+  }
+
+  function showRouteInfo(data, passengerType, passengerInfo, paymentType, payment_method) {
+    let routesHtml = data.routes.map(route => `
+                <div class="route-card">
+                    <p><strong>Mesafe:</strong> ${route.distance} km</p>
+                    <p><strong>Süre:</strong> ${route.duration} dk</p>
+                    <p><strong>Tutar:</strong> ${route.price} TL</p>
+                    <p><strong>En İyi:</strong> ${route.best_for}</p>
+                </div>
+            `).join('');
+
+    let passengerDisplay = `
+                <div class="route-card">
+                    <p><strong>Ad Soyad:</strong> ${passengerInfo.name_surname}</p>
+                    <p><strong>Başlangıç:</strong> ${passengerInfo.location.start.lat.toFixed(6)}, ${passengerInfo.location.start.lon.toFixed(6)}</p>
+                    <p><strong>Hedef:</strong> ${passengerInfo.location.target.lat.toFixed(6)}, ${passengerInfo.location.target.lon.toFixed(6)}</p>
+                    ${passengerType === 'student' ? `<p><strong>Öğrenci ID:</strong> ${passengerInfo.student_id}</p>` : ''}
+                    ${passengerType === 'old' ? `<p><strong>Geçiş Kartı:</strong> ${passengerInfo.pass_card}</p>` : ''}
+                </div>
+            `;
+
+    let paymentDisplay = '';
+    if (paymentType === 'card') {
+      paymentDisplay = `
+                    <div class="route-card">
+                        <p><strong>Ödeme:</strong> Kredi Kartı</p>
+                        <p><strong>Kart No:</strong> ${payment_method.card_number}</p>
+                        <p><strong>Limit:</strong> ${payment_method.limit} TL</p>
+                    </div>
+                `;
+    } else if (paymentType === 'cash') {
+      paymentDisplay = `
+                    <div class="route-card">
+                        <p><strong>Ödeme:</strong> Nakit</p>
+                        <p><strong>Miktar:</strong> ${payment_method.cash} TL</p>
+                    </div>
+                `;
+    } else if (paymentType === 'cityCard') {
+      paymentDisplay = `
+                    <div class="route-card">
+                        <p><strong>Ödeme:</strong> Kentkart</p>
+                        <p><strong>Kart No:</strong> ${payment_method.card_number}</p>
+                        <p><strong>Bakiye:</strong> ${payment_method.balance} TL</p>
+                    </div>
+                `;
+    }
+
+    document.getElementById('routeInfo').innerHTML = `
+                ${passengerDisplay}
+                ${paymentDisplay}
+                <h4 class="mt-2 font-semibold text-center">Rotalar</h4>
+                ${routesHtml}
+            `;
+
+    const popup = document.getElementById('routePopup');
+    const overlay = document.getElementById('overlay');
+    popup.classList.add('show');
+    overlay.classList.add('show');
+  }
+
+  function closePopup() {
+    const popup = document.getElementById('routePopup');
+    const overlay = document.getElementById('overlay');
+    popup.classList.remove('show');
+    overlay.classList.remove('show');
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
+</body>
+</html>
