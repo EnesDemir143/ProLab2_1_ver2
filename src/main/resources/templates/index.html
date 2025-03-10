@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -355,7 +355,7 @@
 </div>
 <div id="overlay" class="overlay" onclick="closePopup()"></div>
 
-<script>
+<script th:inline="javascript">
   function toggleMode() {
     document.body.classList.toggle('night-mode');
     const toggle = document.querySelector('.mode-toggle');
@@ -367,7 +367,7 @@
     section.classList.toggle('show');
   }
 
-  var stops = {{ stops|tojson|safe }};
+  var stops = /*[[${stops}]]*/ [];
   var map;
   var polylines = [];
   var infoWindow;
@@ -672,6 +672,6 @@
     overlay.classList.remove('show');
   }
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
+<script th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${api_key} + '&callback=initMap'}" async defer></script>
 </body>
 </html>
