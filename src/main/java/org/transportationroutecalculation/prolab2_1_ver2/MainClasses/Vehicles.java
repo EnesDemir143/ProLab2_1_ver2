@@ -9,8 +9,8 @@ public abstract class Vehicles {
 }
 class Taxi extends Vehicles {
 
-    private Double opening_fee;
-    private double cost_per_km;
+    private static Double opening_fee;
+    private static Double cost_per_km;
 
 
     @Override

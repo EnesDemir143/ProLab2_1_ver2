@@ -38,7 +38,6 @@ class Students extends Passengers {
 }
 
 
-
 class OldPeople extends Passengers {
 
     private String PassCard;
