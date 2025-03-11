@@ -1,21 +1,22 @@
 package org.transportationroutecalculation.prolab2_1_ver2.MainClasses;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
 
 public abstract class Locations {
 
-    private Float lat;
-    private Float lon;
+    private Point2D.Double location;
 
-    public Locations(Float lat, Float lon) {
-        this.lat = lat;
-        this.lon = lon;
+    public Locations(Point2D.Double location) {
+        this.location = location;
     }
 
-    public Float[] get_current_location(){
-        return new Float[]{lat,lon};
+    public Point2D.Double getCurrentLocation() {
+        return location;
     }
+
 
     abstract List<Map.Entry<String, Double>> nearestStation();
 
@@ -24,8 +25,21 @@ public abstract class Locations {
 
 class CurrentLocation extends Locations {
 
-    public CurrentLocation(Float lat, Float lon) {
-        super(lat, lon);
+    public CurrentLocation(Point2D.Double location) {
+        super(location);
+    }
+
+    @Override
+    List<Map.Entry<String, Double>> nearestStation() {
+        return List.of();
+    }
+
+}
+
+class TargetLocation extends Locations {
+
+    public TargetLocation(Point2D.Double location) {
+        super(location);
     }
 
     @Override
