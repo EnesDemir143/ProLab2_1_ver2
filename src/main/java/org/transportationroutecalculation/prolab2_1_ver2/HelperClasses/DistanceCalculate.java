@@ -3,8 +3,9 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses;
 import com.google.maps.DistanceMatrixApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DistanceMatrix;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.awt.geom.Point2D;
 
@@ -12,7 +13,7 @@ public interface DistanceCalculate {
     double calculateDistance(Point2D.Double source, Point2D.Double destination);
 }
 
-@Component
+@Service("googleMaps")
 class GoogleMapsDistanceCalculator implements DistanceCalculate {
     private final String apiKey;
 
