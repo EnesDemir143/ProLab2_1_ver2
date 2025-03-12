@@ -1,7 +1,13 @@
 package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import java.awt.geom.Point2D;
 
+
+@Service
+@Qualifier("euclidean")
 public class EuclideanDistance implements DistanceCalculate {
 
     @Override

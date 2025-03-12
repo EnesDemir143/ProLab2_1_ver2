@@ -13,7 +13,7 @@ public abstract class Locations {
         this.location = location;
     }
 
-    public Point2D.Double getCurrentLocation() {
+    public Point2D.Double getLocation() {
         return location;
     }
 
