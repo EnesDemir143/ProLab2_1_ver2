@@ -1,4 +1,4 @@
-import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.Locations;
+package org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations;
 
 import java.awt.geom.Point2D;
 import java.util.List;
