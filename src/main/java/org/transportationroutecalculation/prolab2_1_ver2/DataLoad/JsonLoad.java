@@ -1,6 +1,9 @@
 package org.transportationroutecalculation.prolab2_1_ver2.DataLoad;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Transfer;
@@ -9,18 +12,27 @@ import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Vehicles.Ta
 import java.io.File;
 import java.util.ArrayList;
 
+@Service
 public class JsonLoad {
-    private String path;
 
-    public JsonLoad(String path) {
-        this.path = path;
+    @Value("${json.file.path}")
+    private String path;
+    private Data data;
+
+    private final ObjectMapper objectMapper;
+
+    public JsonLoad(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    @PostConstruct
+    public void init() {
+        load();
     }
 
     public double load() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         try {
-            Data data = objectMapper.readValue(new File(path), Data.class);
+            data = objectMapper.readValue(new File(path), Data.class);
             Taxi taxi = data.getTaxi();
             double distance = 10.0;
             double totalCost = taxi.calculate_price(distance);
@@ -45,7 +57,7 @@ public class JsonLoad {
             for (Stations station : data.getStations()) {
                 ArrayList<NextStation> nextStations = station.getNext_stations();
                 if (nextStations != null && !nextStations.isEmpty()) {
-                    for (NextStation nextStation : nextStations){
+                    for (NextStation nextStation : nextStations) {
                         String nextStationStopId = nextStation.getStopId();
                         Stations targetStation = data.getStationMap().get(nextStationStopId);
                         if (targetStation != null) {
@@ -55,7 +67,6 @@ public class JsonLoad {
                 }
             }
 
-            // Station’ları yazdır
             for (Stations station : data.getStations()) {
                 System.out.print("Station: " + station.getStationID() +
                         ", Name: " + station.getName() +
@@ -68,14 +79,13 @@ public class JsonLoad {
                 } else {
                     System.out.println("No transfers available");
                 }
-                ArrayList<NextStation> nextStation = station.getNext_stations();
-                if (nextStation != null && !nextStation.isEmpty()) {
-                    System.out.println(nextStation.toString());
+                ArrayList<NextStation> nextStations = station.getNext_stations();
+                if (nextStations != null && !nextStations.isEmpty()) {
+                    System.out.println(nextStations.toString());
                 } else {
                     System.out.println("No nextStation available");
                 }
             }
-
 
             return totalCost;
 
@@ -84,9 +94,7 @@ public class JsonLoad {
         }
     }
 
-    public static void main(String[] args) {
-        JsonLoad jsonLoad = new JsonLoad("src/main/java/org/transportationroutecalculation/prolab2_1_ver2/Data/veriseti.json");
-        double result = jsonLoad.load();
-        System.out.println("Toplam maliyet: " + result);
+    public Data getData() {
+        return data;
     }
 }
