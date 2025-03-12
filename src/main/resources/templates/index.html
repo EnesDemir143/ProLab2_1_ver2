@@ -514,24 +514,34 @@
       return;
     }
 
-    let passengers = { nameSurname: nameSurname };
+    const paymentType = document.getElementById('payment_method').value;
+    if (!paymentType) {
+      alert('Lütfen bir ödeme yöntemi seçin.');
+      return;
+    }
+
+    let passengers = { type: passengerType, nameSurname: nameSurname };
     if (passengerType === 'student') {
       passengers.student_id = document.getElementById('student_id').value || '';
     } else if (passengerType === 'old') {
-      passengers.passCard = document.getElementById('pass_card').value || '';
+      passengers.pass_card = document.getElementById('pass_card').value || '';
     }
 
-    const paymentType = document.getElementById('payment_method').value;
     let payment_method;
     if (paymentType === 'card') {
       payment_method = {
+        type: 'creditCard',
         limit: parseFloat(document.getElementById('card_limit').value) || 0,
         card_number: document.getElementById('card_number').value || ''
       };
     } else if (paymentType === 'cash') {
-      payment_method = { cash: parseFloat(document.getElementById('cash_amount').value) || 0 };
+      payment_method = {
+        type: 'cash',
+        cash: parseFloat(document.getElementById('cash_amount').value) || 0
+      };
     } else if (paymentType === 'cityCard') {
       payment_method = {
+        type: 'cityCard',
         balance: parseFloat(document.getElementById('card_balance').value) || 0,
         card_number: document.getElementById('card_number2').value || ''
       };
@@ -547,7 +557,7 @@
     polylines.forEach(poly => poly.setMap(null));
     polylines = [];
 
-    fetch('/draw_route', {
+    fetch('/api/draw_route', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestData)
@@ -559,53 +569,32 @@
               return response.json();
             })
             .then(data => {
-              data.routes.forEach((route, index) => {
-                const path = route.path.map(coord => ({ lat: coord.lat, lng: coord.lng }));
-                const polyline = new google.maps.Polyline({
-                  path: path,
-                  geodesic: true,
-                  strokeColor: ['#ff1493', '#00ff00', '#0000ff'][index % 3],
-                  strokeOpacity: 0.9,
-                  strokeWeight: 6,
-                  map: map
-                });
-                polylines.push(polyline);
-
-                polyline.addListener('mouseover', function(event) {
-                  const content = `
-                            <div class="route-info-tooltip">
-                                <strong>Mesafe:</strong> ${route.distance} km<br>
-                                <strong>Süre:</strong> ${route.duration} dk<br>
-                                <strong>Tutar:</strong> ${route.price} TL<br>
-                                <strong>En İyi:</strong> ${route.best_for}
-                            </div>
-                        `;
-                  infoWindow.setContent(content);
-                  infoWindow.setPosition(event.latLng);
-                  infoWindow.open(map);
-                });
-
-                polyline.addListener('mouseout', function() {
-                  infoWindow.close();
-                });
-              });
-
-              map.setCenter({ lat: data.start_point.lat, lng: data.start_point.lon });
-
-              const passengerInfo = {
-                name_surname: nameSurname,
-                location: { start: { lat: start_lat, lon: start_lon }, target: { lat: end_lat, lon: end_lon } }
-              };
-              if (passengerType === 'student') passengerInfo.student_id = document.getElementById('student_id').value || '';
-              else if (passengerType === 'old') passengerInfo.pass_card = document.getElementById('pass_card').value || '';
-
-              showRouteInfo(data, passengerType, passengerInfo, paymentType, payment_method);
+              showTestResponse(requestData, data);
             })
             .catch(error => {
               alert('Rota çizilirken bir hata oluştu: ' + error.message);
             });
   }
+  function showTestResponse(requestData, responseData) {
+    const paymentTypeDisplay = requestData.payment_method && requestData.payment_method.type
+            ? requestData.payment_method.type
+            : 'Bilinmeyen ödeme yöntemi';
 
+    const routeInfo = `
+    <div class="route-card">
+      <p><strong>Başlangıç:</strong> ${requestData.start_location.lat}, ${requestData.start_location.lon}</p>
+      <p><strong>Hedef:</strong> ${requestData.target_location.lat}, ${requestData.target_location.lon}</p>
+      <p><strong>Yolcu:</strong> ${requestData.passengers.nameSurname} (${requestData.passengers.type})</p>
+      <p><strong>Ödeme:</strong> ${paymentTypeDisplay}</p>
+      <p><strong>Backend Yanıtı:</strong> ${JSON.stringify(responseData)}</p>
+    </div>
+  `;
+    document.getElementById('routeInfo').innerHTML = routeInfo;
+    const popup = document.getElementById('routePopup');
+    const overlay = document.getElementById('overlay');
+    popup.classList.add('show');
+    overlay.classList.add('show');
+  }
   function showRouteInfo(data, passengerType, passengerInfo, paymentType, payment_method) {
     let routesHtml = data.routes.map(route => `
                 <div class="route-card">
