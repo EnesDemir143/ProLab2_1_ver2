@@ -7,6 +7,8 @@ public class Transfer {
     @JsonProperty("transferStopId")
     private String transferStopId;
 
+    private Stations transferStation;
+
     @JsonProperty("transferUcret")
     private Double transfer_amount;
 
@@ -31,6 +33,14 @@ public class Transfer {
         this.transferStopId = transferStopId;
     }
 
+    public Stations getTransferStation() {
+        return transferStation;
+    }
+
+    public void setTransferStation(Stations transferStation) {
+        this.transferStation = transferStation;
+    }
+
     public Double getTransfer_amount() {
         return transfer_amount;
     }
@@ -50,7 +60,7 @@ public class Transfer {
     @Override
     public String toString() {
         return "Transfer{" +
-                "transferStopId='" + transferStopId + '\'' +
+                "transferStation=" + (transferStation != null ? transferStation.getStationID() : transferStopId) +
                 ", transfer_amount=" + transfer_amount +
                 ", transfer_time=" + transfer_time +
                 '}';
