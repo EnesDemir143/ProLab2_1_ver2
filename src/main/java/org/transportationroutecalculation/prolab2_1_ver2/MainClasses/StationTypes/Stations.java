@@ -38,7 +38,7 @@ public abstract class Stations {
     @JsonProperty("transfer")
     private ArrayList<Transfer> transfer = new ArrayList<>();
 
-    private static final ObjectMapper mapper = new ObjectMapper();  // LinkedHashMap’i Transfer’a çevirmek için
+    private static final ObjectMapper mapper = new ObjectMapper();  
 
     public Stations() {
         this.location = new Point2D.Double(0.0, 0.0);

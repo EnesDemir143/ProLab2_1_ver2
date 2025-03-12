@@ -1,17 +1,12 @@
-package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses;
+package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Map;
-
-public abstract class Controllers {
-
-
-}
 
 @Service
 class WalkingController extends Controllers {
@@ -31,9 +26,4 @@ class WalkingController extends Controllers {
 
         return Map.entry(distance<=MAX_WALKING_DISTANCE, distance);
     }
-}
-
-
-class PaymentController extends Controllers {
-
 }
