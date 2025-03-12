@@ -7,6 +7,8 @@ public class NextStation {
     @JsonProperty("stopId")
     private String stopId;
 
+    private Stations Nextstation;
+
     @JsonProperty("mesafe")
     private Double distance;
 
@@ -25,6 +27,14 @@ public class NextStation {
         this.distance = distance;
         this.amount = amount;
         this.time = time;
+    }
+
+    public Stations getNextstation() {
+        return Nextstation;
+    }
+
+    public void setNextstation(Stations nextstation) {
+        Nextstation = nextstation;
     }
 
     public String getStopId() {
@@ -57,5 +67,16 @@ public class NextStation {
 
     public void setTime(Integer time) {
         this.time = time;
+    }
+
+    @Override
+    public String toString() {
+        return "NextStation{" +
+                "stopId='" + stopId + '\'' +
+                ", Nextstation=" + (Nextstation != null ? Nextstation.getStationID() : Nextstation) +
+                ", distance=" + distance +
+                ", amount=" + amount +
+                ", time=" + time +
+                '}';
     }
 }

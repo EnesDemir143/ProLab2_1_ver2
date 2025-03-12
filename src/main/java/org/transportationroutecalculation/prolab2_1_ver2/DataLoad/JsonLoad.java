@@ -1,6 +1,7 @@
 package org.transportationroutecalculation.prolab2_1_ver2.DataLoad;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Transfer;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Vehicles.Taxi;
@@ -28,7 +29,6 @@ public class JsonLoad {
             System.out.println("Cost per KM: " + taxi.getCost_per_km());
             System.out.println("Stations loaded: " + data.getStations().length);
 
-            // Transfer’ları bağla
             for (Stations station : data.getStations()) {
                 ArrayList<Transfer> transfers = station.getTransfer();
                 if (transfers != null && !transfers.isEmpty()) {
@@ -37,6 +37,19 @@ public class JsonLoad {
                         Stations targetStation = data.getStationMap().get(transferStopId);
                         if (targetStation != null) {
                             transfer.setTransferStation(targetStation);
+                        }
+                    }
+                }
+            }
+
+            for (Stations station : data.getStations()) {
+                ArrayList<NextStation> nextStations = station.getNext_stations();
+                if (nextStations != null && !nextStations.isEmpty()) {
+                    for (NextStation nextStation : nextStations){
+                        String nextStationStopId = nextStation.getStopId();
+                        Stations targetStation = data.getStationMap().get(nextStationStopId);
+                        if (targetStation != null) {
+                            nextStation.setNextstation(targetStation);
                         }
                     }
                 }
@@ -55,7 +68,15 @@ public class JsonLoad {
                 } else {
                     System.out.println("No transfers available");
                 }
+                ArrayList<NextStation> nextStation = station.getNext_stations();
+                if (nextStation != null && !nextStation.isEmpty()) {
+                    System.out.println(nextStation.toString());
+                } else {
+                    System.out.println("No nextStation available");
+                }
             }
+
+
             return totalCost;
 
         } catch (Exception e) {
