@@ -1,4 +1,4 @@
-package org.transportationroutecalculation.prolab2_1_ver2;
+package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class Api {
+public class GetApi {
 
     @Value("${API_KEY}")
     private String apiKey;
@@ -24,7 +24,7 @@ public class Api {
     private List<Map<String, Object>> stationsList = new ArrayList<>();
 
     @Autowired
-    public Api(JsonLoad jsonLoad) {
+    public GetApi(JsonLoad jsonLoad) {
          this.data = jsonLoad.getData();
     }
 

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
-import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.Locations;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.ArrayList;
