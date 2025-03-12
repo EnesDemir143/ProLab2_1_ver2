@@ -23,6 +23,17 @@ class WalkingController extends Controllers {
         this.distanceCalculator = distanceCalculator;
     }
     public Map.Entry<Boolean, Double> can_proceed(Point2D.Double source, Point2D.Double destination) {
+        Double distance = distanceCalculator.calculateDistance(source, destination);
 
+        if (distance < 0) {
+            throw new IllegalArgumentException("Mesafa negatif olamaz");
+        }
+
+        return Map.entry(distance<=MAX_WALKING_DISTANCE, distance);
     }
+}
+
+
+class PaymentController extends Controllers {
+
 }
