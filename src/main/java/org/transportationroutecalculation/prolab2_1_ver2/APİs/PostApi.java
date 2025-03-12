@@ -1,14 +1,15 @@
 package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class PostApi {
@@ -20,20 +21,32 @@ public class PostApi {
         this.routeService = routeService;
     }
 
-    @PostMapping("/draw_route")
-    public ResponseEntity<String> drawRoute(@RequestBody RequestData data) {
-        routeService.setRequestData(data);
+    @PostMapping("/api/draw_route")
+    public ResponseEntity<Map<String, Object>> drawRoute(@RequestBody RequestData data) {
+        try {
+            routeService.setRequestData(data);
 
-        StringBuilder response = new StringBuilder();
-        response.append("Route calculation started:\n");
-        response.append("Start Location: ").append(data.getCurrentLocation()).append("\n");
-        response.append("Target Location: ").append(data.getTargetLocation()).append("\n");
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Rota hesaplama başarıyla alındı");
 
-        data.getPassenger().ifPresent(passenger ->
-                response.append("Passenger: ").append(passenger).append("\n"));
-        data.getPaymentMethod().ifPresent(paymentMethod ->
-                response.append("Payment Method: ").append(paymentMethod).append("\n"));
+            Map<String, Object> routeDetails = new HashMap<>();
+            routeDetails.put("start_location", data.getCurrentLocation());
+            routeDetails.put("target_location", data.getTargetLocation());
+            data.getPassenger().ifPresent(passenger -> routeDetails.put("passenger", passenger));
+            data.getPaymentMethod().ifPresent(paymentMethod -> routeDetails.put("payment_method", paymentMethod));
 
-        return ResponseEntity.ok(response.toString());
+            response.put("route_details", routeDetails);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "İstek işlenirken hata oluştu: " + e.getMessage());
+            errorResponse.put("stackTrace", e.getStackTrace()[0].toString());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
+
 }

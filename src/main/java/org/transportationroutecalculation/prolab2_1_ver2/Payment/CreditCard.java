@@ -1,9 +1,18 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Payment;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CreditCard extends PaymentMethods{
 
+    @JsonProperty("limit")
     private int limit;
+    @JsonProperty("card_number")
     private String number;
+
+
+    public CreditCard() {
+        super();
+    }
 
     public CreditCard(int limit, String number) {
         this.limit = limit;

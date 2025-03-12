@@ -1,6 +1,7 @@
 package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.CurrentLocation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.TargetLocation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
@@ -12,13 +13,13 @@ public class RequestData {
     @JsonProperty("start_location")
     private CurrentLocation currentLocation;
 
-    @JsonProperty("start_location")
+    @JsonProperty("target_location")
     private TargetLocation targetLocation;
 
-    @JsonProperty("start_location")
+    @JsonProperty("passengers")
     private Optional<Passengers> passenger;
 
-    @JsonProperty("start_location")
+    @JsonProperty("payment_method")
     private Optional<PaymentMethods> paymentMethod;
 
     public RequestData() {

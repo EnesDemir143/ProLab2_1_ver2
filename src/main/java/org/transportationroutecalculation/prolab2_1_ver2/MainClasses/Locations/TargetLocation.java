@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class TargetLocation extends Locations {
 
+    public TargetLocation() {
+        super();
+    }
+
     public TargetLocation(Point2D.Double location) {
         super(location);
     }
