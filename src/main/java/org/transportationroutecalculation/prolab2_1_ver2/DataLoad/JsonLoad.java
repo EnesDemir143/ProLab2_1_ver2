@@ -30,7 +30,7 @@ public class JsonLoad {
                         ", Name: " + station.getName() +
                         ", Type: " + station.getStationType() +
                         ", Location: (" + station.getLocation().getX() + ", " + station.getLocation().getY() + ")" +
-                        ", " + station.getNext_stations().size() + " next stations");
+                        ", Transfers: " + (station.getTransfer().isEmpty() ? "None" : station.getTransfer().getFirst().toString()));
             }
             return totalCost;
 

@@ -46,4 +46,13 @@ public class Transfer {
     public void setTransfer_time(Integer transfer_time) {
         this.transfer_time = transfer_time;
     }
+
+    @Override
+    public String toString() {
+        return "Transfer{" +
+                "transferStopId='" + transferStopId + '\'' +
+                ", transfer_amount=" + transfer_amount +
+                ", transfer_time=" + transfer_time +
+                '}';
+    }
 }

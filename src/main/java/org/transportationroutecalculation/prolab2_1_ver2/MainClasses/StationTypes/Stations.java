@@ -1,11 +1,15 @@
 package org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
@@ -13,9 +17,6 @@ import java.util.ArrayList;
         @JsonSubTypes.Type(value = TramStation.class, name = "tram")
 })
 public abstract class Stations {
-
-    @JsonProperty("city")
-    private String city;
 
     @JsonProperty("id")
     private String stationID;
@@ -35,32 +36,51 @@ public abstract class Stations {
     private ArrayList<NextStation> next_stations = new ArrayList<>();
 
     @JsonProperty("transfer")
-    private Transfer transfer;
+    private ArrayList<Transfer> transfer = new ArrayList<>();
+
+    private static final ObjectMapper mapper = new ObjectMapper();  // LinkedHashMap’i Transfer’a çevirmek için
 
     public Stations() {
-
+        this.location = new Point2D.Double(0.0, 0.0);
+        this.transfer = new ArrayList<>();
     }
 
-    public Stations(String city,String stationID, String stationType, Point2D.Double location, Boolean is_last_station) {
-        this.city = city;
+    public Stations(String stationID, String stationType, Point2D.Double location, Boolean is_last_station) {
         this.stationID = stationID;
         this.stationType = stationType;
         this.location = location;
         this.is_last_station = is_last_station;
+        this.transfer = new ArrayList<>();
     }
 
-    public Stations(String city,String stationID, String stationType, Point2D.Double location, Boolean is_last_station,
-                    ArrayList<NextStation> next_stations, Transfer transfer) {
-        this.city = city;
+    public Stations(String stationID, String stationType, Point2D.Double location, Boolean is_last_station,
+                    ArrayList<NextStation> next_stations, ArrayList<Transfer> transfer) {
         this.stationID = stationID;
         this.stationType = stationType;
         this.location = location;
         this.is_last_station = is_last_station;
         this.next_stations = next_stations;
-        this.transfer = transfer;
+        this.transfer = (transfer != null) ? transfer : new ArrayList<>();
     }
 
-    // Getters and setters
+    @JsonSetter("transfer")
+    public void setTransfer(Object transfer) {
+        System.out.println("setTransfer called with: " + transfer);
+        if (transfer == null) {
+            this.transfer = new ArrayList<>();
+        } else if (transfer instanceof ArrayList) {
+            this.transfer = (ArrayList<Transfer>) transfer;
+        } else if (transfer instanceof LinkedHashMap) {
+            Transfer singleTransfer = mapper.convertValue(transfer, Transfer.class);
+            this.transfer = new ArrayList<>(Collections.singletonList(singleTransfer));
+        } else if (transfer instanceof Transfer) {
+            this.transfer = new ArrayList<>(Collections.singletonList((Transfer) transfer));
+        } else {
+            this.transfer = new ArrayList<>();
+            System.out.println("Unexpected transfer type: " + transfer.getClass());
+        }
+    }
+
     public String getStationID() {
         return stationID;
     }
@@ -125,19 +145,11 @@ public abstract class Stations {
         this.next_stations = next_stations;
     }
 
-    public Transfer getTransfer() {
+    public ArrayList<Transfer> getTransfer() {
         return transfer;
     }
 
-    public void setTransfer(Transfer transfer) {
-        this.transfer = transfer;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
+    public void setTransfer(ArrayList<Transfer> transfer) {
+        this.transfer = (transfer != null) ? transfer : new ArrayList<>();
     }
 }
