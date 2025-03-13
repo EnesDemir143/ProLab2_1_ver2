@@ -1,7 +1,5 @@
 package org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

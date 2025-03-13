@@ -22,5 +22,4 @@ public class TargetLocation extends Locations {
         return List.of();
     }
 
-
 }

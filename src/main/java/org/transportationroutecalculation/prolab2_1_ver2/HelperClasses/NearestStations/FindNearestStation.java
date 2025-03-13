@@ -31,6 +31,11 @@ public class FindNearestStation {
 
         for (Stations station : data.getStations()){
             double distance = distanceCalculate.calculateDistance(location.getLocation(), station.getLocation());
+
+            if (distance < 0){
+                throw new RuntimeException("Distance can not be negative");
+            }
+
             distanceList.add(new Distances<>(station.getStationID(), distance));
         }
 
