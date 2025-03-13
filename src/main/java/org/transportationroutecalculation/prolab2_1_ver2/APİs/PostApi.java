@@ -38,6 +38,8 @@ public class PostApi {
 
             response.put("route_details", routeDetails);
 
+            routeService.getRouteSummary();
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();

@@ -548,8 +548,8 @@
     }
 
     const requestData = {
-      start_location: { lat: start_lat, lon: start_lon },
-      target_location: { lat: end_lat, lon: end_lon },
+      start_location: { type: "current", lat: start_lat, lon: start_lon },
+      target_location: { type: "target", lat: end_lat, lon: end_lon },
       passengers: passengers,
       payment_method: payment_method
     };
