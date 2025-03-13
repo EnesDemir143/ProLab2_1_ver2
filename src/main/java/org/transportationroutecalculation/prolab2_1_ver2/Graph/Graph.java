@@ -28,6 +28,13 @@ public class Graph {
 
     private Map<Stations, List<Edge>> graph = new HashMap<>();
 
+    public void addEdge(Stations node,Stations destination, double distance, double amount, int time) {
+        graph.putIfAbsent(node, new ArrayList<>());
+        graph.get(node).add(new Edge(destination, distance, amount, time));
+    }
 
+    public Map<Stations, List<Edge>> getGraph() {
 
+        return graph;
+    }
 }
