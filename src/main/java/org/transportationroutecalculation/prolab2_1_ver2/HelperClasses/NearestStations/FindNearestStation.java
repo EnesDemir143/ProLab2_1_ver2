@@ -25,9 +25,9 @@ public class FindNearestStation {
         this.distanceCalculate = distanceCalculate;
     }
 
-    public List<Distances<String, Double>> find_nearest_station(Locations location) {
+    public List<Distances<Stations, Double>> find_nearest_station(Locations location) {
 
-        List<Distances<String, Double>> distanceList = new ArrayList<>();
+        List<Distances<Stations, Double>> distanceList = new ArrayList<>();
 
         for (Stations station : data.getStations()){
             double distance = distanceCalculate.calculateDistance(location.getLocation(), station.getLocation());
@@ -36,7 +36,7 @@ public class FindNearestStation {
                 throw new RuntimeException("Distance can not be negative");
             }
 
-            distanceList.add(new Distances<>(station.getStationID(), distance));
+            distanceList.add(new Distances<>(station, distance));
         }
 
         distanceList.sort((a, b) -> a.distance().compareTo(b.distance()));

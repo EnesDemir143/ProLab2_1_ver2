@@ -554,9 +554,6 @@
       payment_method: payment_method
     };
 
-    polylines.forEach(poly => poly.setMap(null));
-    polylines = [];
-
     fetch('/api/draw_route', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -569,84 +566,102 @@
               return response.json();
             })
             .then(data => {
-              showTestResponse(requestData, data);
+              drawPathOnMap(data);
+              showRouteInfo(data, requestData);
             })
             .catch(error => {
               alert('Rota çizilirken bir hata oluştu: ' + error.message);
             });
   }
-  function showTestResponse(requestData, responseData) {
-    const paymentTypeDisplay = requestData.payment_method && requestData.payment_method.type
-            ? requestData.payment_method.type
-            : 'Bilinmeyen ödeme yöntemi';
 
-    const routeInfo = `
-    <div class="route-card">
-      <p><strong>Başlangıç:</strong> ${requestData.start_location.lat}, ${requestData.start_location.lon}</p>
-      <p><strong>Hedef:</strong> ${requestData.target_location.lat}, ${requestData.target_location.lon}</p>
-      <p><strong>Yolcu:</strong> ${requestData.passengers.nameSurname} (${requestData.passengers.type})</p>
-      <p><strong>Ödeme:</strong> ${paymentTypeDisplay}</p>
-      <p><strong>Backend Yanıtı:</strong> ${JSON.stringify(responseData)}</p>
-    </div>
-  `;
-    document.getElementById('routeInfo').innerHTML = routeInfo;
-    const popup = document.getElementById('routePopup');
-    const overlay = document.getElementById('overlay');
-    popup.classList.add('show');
-    overlay.classList.add('show');
+  function drawPathOnMap(data) {
+    polylines.forEach(poly => poly.setMap(null));
+    polylines = [];
+
+    data.routes.forEach((route, index) => {
+      const pathCoordinates = route.path.map(coord => ({
+        lat: coord.lat,
+        lng: coord.lon
+      }));
+
+      const routePolyline = new google.maps.Polyline({
+        path: pathCoordinates,
+        geodesic: true,
+        strokeColor: index === 0 ? '#FF6F61' : '#8B5CF6',
+        strokeOpacity: 1.0,
+        strokeWeight: 4
+      });
+
+      routePolyline.setMap(map);
+      polylines.push(routePolyline);
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    data.routes.forEach(route => {
+      route.path.forEach(coord => {
+        bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
+      });
+    });
+    map.fitBounds(bounds);
   }
-  function showRouteInfo(data, passengerType, passengerInfo, paymentType, payment_method) {
+
+  function showRouteInfo(data, requestData) {
+    const passengerType = requestData.passengers.type;
+    const nameSurname = requestData.passengers.nameSurname;
+    const paymentType = requestData.payment_method.type;
+    const paymentMethod = requestData.payment_method;
+
     let routesHtml = data.routes.map(route => `
-                <div class="route-card">
-                    <p><strong>Mesafe:</strong> ${route.distance} km</p>
-                    <p><strong>Süre:</strong> ${route.duration} dk</p>
-                    <p><strong>Tutar:</strong> ${route.price} TL</p>
-                    <p><strong>En İyi:</strong> ${route.best_for}</p>
-                </div>
-            `).join('');
+      <div class="route-card">
+        <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+        <p><strong>Süre:</strong> ${route.duration} dk</p>
+        <p><strong>Tutar:</strong> ${route.price.toFixed(1)} TL</p>
+        <p><strong>En İyi:</strong> ${route.bestFor}</p>
+      </div>
+    `).join('');
 
     let passengerDisplay = `
-                <div class="route-card">
-                    <p><strong>Ad Soyad:</strong> ${passengerInfo.name_surname}</p>
-                    <p><strong>Başlangıç:</strong> ${passengerInfo.location.start.lat.toFixed(6)}, ${passengerInfo.location.start.lon.toFixed(6)}</p>
-                    <p><strong>Hedef:</strong> ${passengerInfo.location.target.lat.toFixed(6)}, ${passengerInfo.location.target.lon.toFixed(6)}</p>
-                    ${passengerType === 'student' ? `<p><strong>Öğrenci ID:</strong> ${passengerInfo.student_id}</p>` : ''}
-                    ${passengerType === 'old' ? `<p><strong>Geçiş Kartı:</strong> ${passengerInfo.pass_card}</p>` : ''}
-                </div>
-            `;
+      <div class="route-card">
+        <p><strong>Ad Soyad:</strong> ${nameSurname}</p>
+        <p><strong>Başlangıç:</strong> ${requestData.start_location.lat.toFixed(6)}, ${requestData.start_location.lon.toFixed(6)}</p>
+        <p><strong>Hedef:</strong> ${requestData.target_location.lat.toFixed(6)}, ${requestData.target_location.lon.toFixed(6)}</p>
+        ${passengerType === 'student' ? `<p><strong>Öğrenci ID:</strong> ${requestData.passengers.student_id || '-'}</p>` : ''}
+        ${passengerType === 'old' ? `<p><strong>Geçiş Kartı:</strong> ${requestData.passengers.pass_card || '-'}</p>` : ''}
+      </div>
+    `;
 
     let paymentDisplay = '';
-    if (paymentType === 'card') {
+    if (paymentType === 'creditCard') {
       paymentDisplay = `
-                    <div class="route-card">
-                        <p><strong>Ödeme:</strong> Kredi Kartı</p>
-                        <p><strong>Kart No:</strong> ${payment_method.card_number}</p>
-                        <p><strong>Limit:</strong> ${payment_method.limit} TL</p>
-                    </div>
-                `;
+        <div class="route-card">
+          <p><strong>Ödeme:</strong> Kredi Kartı</p>
+          <p><strong>Kart No:</strong> ${paymentMethod.card_number || '-'}</p>
+          <p><strong>Limit:</strong> ${paymentMethod.limit.toFixed(1)} TL</p>
+        </div>
+      `;
     } else if (paymentType === 'cash') {
       paymentDisplay = `
-                    <div class="route-card">
-                        <p><strong>Ödeme:</strong> Nakit</p>
-                        <p><strong>Miktar:</strong> ${payment_method.cash} TL</p>
-                    </div>
-                `;
+        <div class="route-card">
+          <p><strong>Ödeme:</strong> Nakit</p>
+          <p><strong>Miktar:</strong> ${paymentMethod.cash.toFixed(1)} TL</p>
+        </div>
+      `;
     } else if (paymentType === 'cityCard') {
       paymentDisplay = `
-                    <div class="route-card">
-                        <p><strong>Ödeme:</strong> Kentkart</p>
-                        <p><strong>Kart No:</strong> ${payment_method.card_number}</p>
-                        <p><strong>Bakiye:</strong> ${payment_method.balance} TL</p>
-                    </div>
-                `;
+        <div class="route-card">
+          <p><strong>Ödeme:</strong> Kentkart</p>
+          <p><strong>Kart No:</strong> ${paymentMethod.card_number || '-'}</p>
+          <p><strong>Bakiye:</strong> ${paymentMethod.balance.toFixed(1)} TL</p>
+        </div>
+      `;
     }
 
     document.getElementById('routeInfo').innerHTML = `
-                ${passengerDisplay}
-                ${paymentDisplay}
-                <h4 class="mt-2 font-semibold text-center">Rotalar</h4>
-                ${routesHtml}
-            `;
+      ${passengerDisplay}
+      ${paymentDisplay}
+      <h4 class="mt-2 font-semibold text-center">Rotalar</h4>
+      ${routesHtml}
+    `;
 
     const popup = document.getElementById('routePopup');
     const overlay = document.getElementById('overlay');

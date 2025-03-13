@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface ShortestPaths {
 
-    abstract void printGraph(Map<Stations, List<Edge>> graphMap);
+    List<Route> findShortestPaths(Stations startStation, Stations endStation);
 }
