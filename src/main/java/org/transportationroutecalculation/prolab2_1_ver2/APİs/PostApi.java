@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Dijkstra;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Route;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
@@ -30,7 +29,7 @@ public class PostApi {
         this.graph = graph;
     }
 
-    @PostMapping("/api/draw_route")
+/*    @PostMapping("/api/draw_route")
     public ResponseEntity<Map<String, Object>> drawRoute(@RequestBody RequestData data, Principal principal) {
         try {
             // Başlangıç ve hedef noktalarını Stations objelerine çevir
@@ -65,5 +64,5 @@ public class PostApi {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(errorResponse);
         }
-    }
+    }*/
 }
