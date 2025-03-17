@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ShortestPaths {
 
-    List<A_star.Node> findShortestPaths(Stations startStation, Stations endStation);
+    List<Node> findShortestPaths(Stations startStation, Stations endStation);
 }

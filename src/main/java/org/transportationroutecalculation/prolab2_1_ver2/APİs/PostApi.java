@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Dijkstra;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Node;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
@@ -21,48 +23,42 @@ public class PostApi {
     private final Dijkstra dijkstra; // Dijkstra algoritmasını enjekte ediyoruz
     private final FindNearestStation findNearestStation;
     private final Graph graph;
+    private final A_star aStar;
 
     @Autowired
-    public PostApi(Dijkstra dijkstra, FindNearestStation findNearestStation, Graph graph) {
+    public PostApi(Dijkstra dijkstra,A_star aStar , FindNearestStation findNearestStation, Graph graph) {
         this.dijkstra = dijkstra;
+        this.aStar = aStar;
         this.findNearestStation = findNearestStation;
         this.graph = graph;
     }
 
     @PostMapping("/api/draw_route")
-    public ResponseEntity<Map<String, Object>> drawRoute(@RequestBody RequestData data, Principal principal) {
+    public void drawRoute(@RequestBody RequestData data, Principal principal) {
         try {
             // Başlangıç ve hedef noktalarını Stations objelerine çevir
             Stations startStation = findNearestStation.find_nearest_station(data.getCurrentLocation()).getFirst().stations();
             System.out.println("Start station: " + startStation.getStationID());
             Stations endStation = findNearestStation.find_nearest_station(data.getTargetLocation()).getFirst().stations();
+            System.out.println("End station: " + endStation.getStationID());
 
-            // Dijkstra algoritmasını çalıştır
-            List<Route> routes = dijkstra.findShortestPaths(startStation, endStation);
-            System.out.println("Routes: " + routes.size());
+            // findShortestPaths metodunu çağır ve sonucu debug et
+            List<Node> path = aStar.findShortestPaths(startStation, endStation);
+            System.out.println("Shortest path: " + path);
 
-            // Mevcut OK yanıtı korundu, sadece routes eklendi
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("message", "Rota hesaplama başarıyla alındı");
-            response.put("routes", routes); // Dijkstra'dan gelen sonucu ekledik
+            // Path içeriğini detaylı şekilde yazdır
+            if (path != null) {
+                for (Node node : path) {
+                    System.out.println("Node: " + node.station.getStationID()); // Node'un toString() metoduna bağlı
+                }
+            } else {
+                System.out.println("Path is null!");
+            }
 
-            Map<String, Object> routeDetails = new HashMap<>();
-            routeDetails.put("start_location", data.getCurrentLocation());
-            routeDetails.put("target_location", data.getTargetLocation());
-            data.getPassenger().ifPresent(passenger -> routeDetails.put("passenger", passenger));
-            data.getPaymentMethod().ifPresent(paymentMethod -> routeDetails.put("payment_method", paymentMethod));
-
-            response.put("route_details", routeDetails);
-
-            return ResponseEntity.ok(response);
+            // JSON yanıtı döndürmüyoruz, sadece debug yapıyoruz
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "İstek işlenirken hata oluştu: " + e.getMessage());
-            errorResponse.put("stackTrace", e.getStackTrace()[0].toString());
+            System.err.println("Hata oluştu: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 }

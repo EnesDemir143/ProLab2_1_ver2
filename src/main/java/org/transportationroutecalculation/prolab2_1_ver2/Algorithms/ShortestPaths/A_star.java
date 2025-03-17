@@ -19,7 +19,7 @@ public class A_star implements ShortestPaths{
     public A_star(Graph graph) {
         this.graph = graph;
         this.graphMap = this.graph.getGraph();
-        if (graph.getGraph().isEmpty()) {
+        if (graphMap.isEmpty()) {
             System.err.println("A_star: Graph boş! Veriler yüklenmedi.");
         } else {
             System.out.println("A_star: Graph başarıyla yüklendi, durak sayısı: " + graph.getGraph().size());
@@ -27,23 +27,6 @@ public class A_star implements ShortestPaths{
     }
 
 
-    class Node implements Comparable<Node> {
-        Stations station;
-        double x, y;
-        double gcost, hcost, fcost;
-        Node parent;
-
-        Node(Stations station, double x, double y) {
-            this.station = station;
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return Double.compare(this.fcost, o.fcost);
-        }
-    }
 
     private double calculateHeuristic(double x1, double y1, double x2, double y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -64,7 +47,7 @@ public class A_star implements ShortestPaths{
 
         for (Map.Entry<Stations, List<Edge>> entry : graphMap.entrySet()) {
             Node node = new Node(entry.getKey(), entry.getKey().getLocation().getX(), entry.getKey().getLocation().getY());
-            graph_with_nodes.put(node, new ArrayList<>());
+            graph_with_nodes.putIfAbsent(node, new ArrayList<>());
 
             for(Edge edge : entry.getValue()){
                 Node neighbor = new Node(edge.getDestination(), edge.getDestination().getLocation().getX(), edge.getDestination().getLocation().getY());
@@ -72,7 +55,7 @@ public class A_star implements ShortestPaths{
                 neighbor.hcost = calculateHeuristic(neighbor.x, neighbor.y, node.x, node.y);
                 neighbor.fcost = Double.POSITIVE_INFINITY;
                 neighbor.parent = node;
-                graph_with_nodes.get(entry.getKey()).add(neighbor);
+                graph_with_nodes.get(node).add(neighbor);
 
             }
         }
