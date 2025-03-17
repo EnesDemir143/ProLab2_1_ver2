@@ -29,7 +29,7 @@ public class PostApi {
         this.graph = graph;
     }
 
-/*    @PostMapping("/api/draw_route")
+    @PostMapping("/api/draw_route")
     public ResponseEntity<Map<String, Object>> drawRoute(@RequestBody RequestData data, Principal principal) {
         try {
             // Başlangıç ve hedef noktalarını Stations objelerine çevir
@@ -64,5 +64,5 @@ public class PostApi {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(errorResponse);
         }
-    }*/
+    }
 }

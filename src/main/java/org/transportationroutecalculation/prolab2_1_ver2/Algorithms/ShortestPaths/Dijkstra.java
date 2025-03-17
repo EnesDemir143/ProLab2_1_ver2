@@ -1,6 +1,5 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths;
 
-import org.jgrapht.GraphMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Edge;
@@ -8,7 +7,6 @@ import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -29,9 +27,9 @@ public class Dijkstra implements ShortestPaths {
     }
 
     @Override
-    public void findShortestPaths(Stations startStation, Stations endStation) {
+    public List<A_star.Node> findShortestPaths(Stations startStation, Stations endStation) {
 
 
-
+        return null;
     }
 }
