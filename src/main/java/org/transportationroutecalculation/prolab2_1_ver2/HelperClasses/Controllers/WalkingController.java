@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.Map;
 
 @Service
-class WalkingController extends Controllers {
+public class WalkingController extends Controllers {
     private static final Double MAX_WALKING_DISTANCE = 3.0;
 
     private DistanceCalculate distanceCalculate;

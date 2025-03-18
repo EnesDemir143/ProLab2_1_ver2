@@ -575,34 +575,40 @@
             });
   }
 
-  function drawPathOnMap(data, routeIndex) {
+  function drawPathOnMap(data) {
+    // Clear existing polylines
     polylines.forEach(poly => poly.setMap(null));
     polylines = [];
 
-    const route = data.routes[routeIndex];
-    const pathCoordinates = route.path.map(coord => ({
-      lat: coord.lat,
-      lng: coord.lon
-    }));
+    // Iterate over each route in the data
+    data.routes.forEach((route, index) => {
+      const pathCoordinates = route.path.map(coord => ({
+        lat: coord.lat,
+        lng: coord.lon
+      }));
 
-    const routePolyline = new google.maps.Polyline({
-      path: pathCoordinates,
-      geodesic: true,
-      strokeColor: routeIndex === 0 ? '#FF6F61' : routeIndex === 1 ? '#8B5CF6' : '#FACC15', // Different colors for each route
-      strokeOpacity: 1.0,
-      strokeWeight: 4
+      // Create a polyline for this route
+      const routePolyline = new google.maps.Polyline({
+        path: pathCoordinates,
+        geodesic: true,
+        strokeColor: ['#FF6F61', '#8B5CF6', '#FACC15'][index % 3], // Different colors for each route
+        strokeOpacity: 1.0,
+        strokeWeight: 4
+      });
+
+      // Add the polyline to the map and store it
+      routePolyline.setMap(map);
+      polylines.push(routePolyline);
     });
 
-    routePolyline.setMap(map);
-    polylines.push(routePolyline);
-
+    // Adjust map bounds to fit all paths
     const bounds = new google.maps.LatLngBounds();
-    route.path.forEach(coord => {
-      bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
+    data.routes.forEach(route => {
+      route.path.forEach(coord => {
+        bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
+      });
     });
     map.fitBounds(bounds);
-
-    currentRouteIndex = routeIndex;
   }
 
   function showRouteInfo(data, requestData) {

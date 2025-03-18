@@ -41,6 +41,7 @@ public class Graph {
             // Add edges for stations with next stations
                 for (NextStation destination : station.getNext_stations()) {
                     addEdge(station, destination.getNextstation(), destination.getDistance(), destination.getAmount(), destination.getTime());
+                    addEdge(destination.getNextstation(), station, destination.getDistance(), destination.getAmount(), destination.getTime()); // Undirected graph için
                 }
             }
 

@@ -10,6 +10,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 @Service
@@ -106,8 +107,8 @@ public class A_star implements ShortestPaths {
             if (current.x == endStation.getLocation().getX() && current.y == endStation.getLocation().getY()){
                 Metrics calculatedMetrics = calculateAllMetrics(followPath(current));
 
-                double[][] paths =followPath(current).stream().map(node -> new double[]{node.x, node.y}).toArray(double[][]::new);
-                return new Path(paths,calculatedMetrics.distance(),calculatedMetrics.time(),calculatedMetrics.amount(), (String) metric.getMetricName());
+                ArrayList<double[]> paths = new ArrayList<>(followPath(current).stream().map(node -> new double[]{node.x, node.y}).toList());
+                return new Path(paths,new AtomicReference<>(calculatedMetrics.distance()),new AtomicReference<>(calculatedMetrics.time()),new AtomicReference<>(calculatedMetrics.amount()), (String) metric.getMetricName());
             }
 
             openSet.remove(current);
