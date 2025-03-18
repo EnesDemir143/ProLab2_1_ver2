@@ -8,6 +8,9 @@ import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationType
 
 import java.util.*;
 
+record Metrics(double amount, int time, double distance) {}
+
+
 @Service
 public class A_star implements ShortestPaths{
 
@@ -32,10 +35,10 @@ public class A_star implements ShortestPaths{
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    private List<Node> followPath(Node node){
+    private List<Node> followPath(Node node) {
         List<Node> path = new ArrayList<>();
         Node current = node;
-        while (current !=null){
+        while (current != null) {
             path.add(current);
             current = current.parent;
         }
@@ -61,9 +64,27 @@ public class A_star implements ShortestPaths{
         }
     }
 
+    private Metrics calculateAllMetrics(List<Node> path){
+        double amount = 0;
+        int time = 0;
+        double distance = 0;
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            for (Edge edge : graphMap.get(path.get(i).station)) {
+                if (edge.getDestination().equals(path.get(i + 1).station)) {
+                    amount += edge.getAmount();
+                    time += edge.getTime();
+                    distance += edge.getDistance();
+                }
+            }
+        }
+
+        return new Metrics(amount, time, distance);
+    }
+
 
     @Override
-    public List<Node> findShortestPaths(Stations startStation, Stations endStation) {
+    public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric) {
 
         create_graph_with_nodes();
         PriorityQueue<Node> openSet = new PriorityQueue<>();
@@ -82,28 +103,30 @@ public class A_star implements ShortestPaths{
             Node current = openSet.poll();
 
             if (current.x == endStation.getLocation().getX() && current.y == endStation.getLocation().getY()){
-                return followPath(current);
+                Metrics calculatedMetrics = calculateAllMetrics(followPath(current));
+
+                double[][] paths =followPath(current).stream().map(node -> new double[]{node.x, node.y}).toArray(double[][]::new);
+                return new Path(paths,calculatedMetrics.distance(),calculatedMetrics.time(),calculatedMetrics.amount(), (String) metric.getMetricName());
             }
 
             openSet.remove(current);
             closedSet.add(current);
 
             for (Node neighbor : graph_with_nodes.get(current)){
-                double tentative_gScore = current.gcost + graphMap.get(current.station).stream().filter(station -> station.getDestination().equals(neighbor.station)).findFirst().get().getDistance();
+                double tentative_gScore = current.gcost + graphMap.get(current.station).stream().filter(station -> station.getDestination().equals(neighbor.station)).findFirst().map(metric.getMetricFunction()).orElse(0.0);
 
                 if (tentative_gScore < neighbor.gcost){
                     neighbor.parent = current;
                     neighbor.gcost = tentative_gScore;
                     neighbor.fcost = neighbor.gcost + neighbor.hcost;
 
-                    if (!openSet.contains(neighbor)){
+                    if (!closedSet.contains(neighbor)){
                         openSet.add(neighbor);
                     }
                 }
 
             }
         }
-
 
         return null;
     }

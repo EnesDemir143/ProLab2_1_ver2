@@ -27,7 +27,7 @@ public class Dijkstra implements ShortestPaths {
     }
 
     @Override
-    public List<Node> findShortestPaths(Stations startStation, Stations endStation) {
+    public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric) {
 
 
         return null;

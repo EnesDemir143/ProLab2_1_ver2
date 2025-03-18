@@ -373,6 +373,7 @@
   var infoWindow;
   var startMarker = null;
   var targetMarker = null;
+  var currentRouteIndex = 0; // Default to distance (index 0)
 
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -566,7 +567,7 @@
               return response.json();
             })
             .then(data => {
-              drawPathOnMap(data);
+              drawPathOnMap(data, 0); // Default to distance route (index 0)
               showRouteInfo(data, requestData);
             })
             .catch(error => {
@@ -574,35 +575,34 @@
             });
   }
 
-  function drawPathOnMap(data) {
+  function drawPathOnMap(data, routeIndex) {
     polylines.forEach(poly => poly.setMap(null));
     polylines = [];
 
-    data.routes.forEach((route, index) => {
-      const pathCoordinates = route.path.map(coord => ({
-        lat: coord.lat,
-        lng: coord.lon
-      }));
+    const route = data.routes[routeIndex];
+    const pathCoordinates = route.path.map(coord => ({
+      lat: coord.lat,
+      lng: coord.lon
+    }));
 
-      const routePolyline = new google.maps.Polyline({
-        path: pathCoordinates,
-        geodesic: true,
-        strokeColor: index === 0 ? '#FF6F61' : '#8B5CF6',
-        strokeOpacity: 1.0,
-        strokeWeight: 4
-      });
-
-      routePolyline.setMap(map);
-      polylines.push(routePolyline);
+    const routePolyline = new google.maps.Polyline({
+      path: pathCoordinates,
+      geodesic: true,
+      strokeColor: routeIndex === 0 ? '#FF6F61' : routeIndex === 1 ? '#8B5CF6' : '#FACC15', // Different colors for each route
+      strokeOpacity: 1.0,
+      strokeWeight: 4
     });
+
+    routePolyline.setMap(map);
+    polylines.push(routePolyline);
 
     const bounds = new google.maps.LatLngBounds();
-    data.routes.forEach(route => {
-      route.path.forEach(coord => {
-        bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
-      });
+    route.path.forEach(coord => {
+      bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
     });
     map.fitBounds(bounds);
+
+    currentRouteIndex = routeIndex;
   }
 
   function showRouteInfo(data, requestData) {
@@ -611,8 +611,8 @@
     const paymentType = requestData.payment_method.type;
     const paymentMethod = requestData.payment_method;
 
-    let routesHtml = data.routes.map(route => `
-      <div class="route-card">
+    let routesHtml = data.routes.map((route, index) => `
+      <div class="route-card" onclick="drawPathOnMap(${JSON.stringify(data)}, ${index})" style="cursor: pointer;">
         <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
         <p><strong>Süre:</strong> ${route.duration} dk</p>
         <p><strong>Tutar:</strong> ${route.price.toFixed(1)} TL</p>

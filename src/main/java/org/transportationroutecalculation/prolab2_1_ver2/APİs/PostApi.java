@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Dijkstra;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Node;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.*;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
@@ -33,6 +31,15 @@ public class PostApi {
         this.graph = graph;
     }
 
+    public static void print2DArray(double[][] array) {
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                System.out.print("data" + array[i][j] + " ");
+            }
+            System.out.println(); // Her satırdan sonra yeni bir satır
+        }
+    }
+
     @PostMapping("/api/draw_route")
     public void drawRoute(@RequestBody RequestData data, Principal principal) {
         try {
@@ -42,20 +49,20 @@ public class PostApi {
             Stations endStation = findNearestStation.find_nearest_station(data.getTargetLocation()).getFirst().stations();
             System.out.println("End station: " + endStation.getStationID());
 
-            // findShortestPaths metodunu çağır ve sonucu debug et
-            List<Node> path = aStar.findShortestPaths(startStation, endStation);
-            System.out.println("Shortest path: " + path);
+            Path path_for_time = aStar.findShortestPaths(startStation, endStation, Metric.TIME);
+            print2DArray(path_for_time.path());
+            System.out.println("Time: " + path_for_time.time());
 
-            // Path içeriğini detaylı şekilde yazdır
-            if (path != null) {
-                for (Node node : path) {
-                    System.out.println("Node: " + node.station.getStationID()); // Node'un toString() metoduna bağlı
-                }
-            } else {
-                System.out.println("Path is null!");
-            }
 
-            // JSON yanıtı döndürmüyoruz, sadece debug yapıyoruz
+
+            Path path_for_distance = aStar.findShortestPaths(startStation, endStation, Metric.DISTANCE);
+            print2DArray(path_for_distance.path());
+            System.out.println("Distance: " + path_for_distance.distance());
+
+            Path path_for_amount = aStar.findShortestPaths(startStation, endStation, Metric.AMOUNT);
+            print2DArray(path_for_amount.path());
+            System.out.println("Amount: " + path_for_amount.amount());
+
         } catch (Exception e) {
             System.err.println("Hata oluştu: " + e.getMessage());
             e.printStackTrace();

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ShortestPaths {
 
-    List<Node> findShortestPaths(Stations startStation, Stations endStation);
+    Path findShortestPaths(Stations startStation, Stations endStation, Metric metric);
 }
