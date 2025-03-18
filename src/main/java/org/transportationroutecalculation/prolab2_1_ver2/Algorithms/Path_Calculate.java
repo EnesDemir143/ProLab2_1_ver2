@@ -59,6 +59,8 @@ public class Path_Calculate {
 
         Boolean walk_control =(walkingController.can_proceed(frontend_data.getCurrentLocation().getLocation(),startStation.getLocation())).getKey();
         double distance = (walkingController.can_proceed(frontend_data.getCurrentLocation().getLocation(),startStation.getLocation())).getValue();
+        System.out.println("Distance nearest: " + distance);
+
 
         double[] firststation = {frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()};
         double[] laststation = {frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()};
@@ -94,17 +96,33 @@ public class Path_Calculate {
             Path path_for_time = aStar.findShortestPaths(startStation, endStation, Metric.TIME);
             path_for_time.path().addFirst(firststation);
             path_for_time.path().addLast(laststation);
+            path_for_time.amount().set(path_for_time.amount().get() + taxi_price);
+            path_for_time.distance().set(path_for_time.distance().get() + distance);
             System.out.println("Time: " + path_for_time.time());
 
             Path path_for_distance = aStar.findShortestPaths(startStation, endStation, Metric.DISTANCE);
             path_for_distance.path().addFirst(firststation);
             path_for_distance.path().addLast(laststation);
+            path_for_distance.amount().set(path_for_distance.amount().get() + taxi_price);
+            path_for_distance.distance().set(path_for_distance.distance().get() + distance);
+
             System.out.println("Distance: " + path_for_distance.distance());
 
             Path path_for_amount = aStar.findShortestPaths(startStation, endStation, Metric.AMOUNT);
             path_for_amount.path().addFirst(firststation);
             path_for_amount.path().addLast(laststation);
+            path_for_amount.amount().set(path_for_amount.amount().get() + taxi_price);
+            path_for_amount.distance().set(path_for_amount.distance().get() + distance);
+
             System.out.println("Amount: " + path_for_amount.amount());
+
+            List<Route> routes = List.of(
+                    new Route(convertPathToCoords(path_for_time.path()), path_for_time.distance().get(), path_for_time.time().get(), path_for_time.amount().get(), "Süre (Time)"),
+                    new Route(convertPathToCoords(path_for_distance.path()), path_for_distance.distance().get(), path_for_distance.time().get(), path_for_distance.amount().get(), "Mesafe (Distance)"),
+                    new Route(convertPathToCoords(path_for_amount.path()), path_for_amount.distance().get(), path_for_amount.time().get(), path_for_amount.amount().get(), "Tutar (Amount)")
+            );
+
+            backEndReturn.put("routes", routes);
 
         }
 
