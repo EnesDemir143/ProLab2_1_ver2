@@ -48,20 +48,25 @@ public class A_star implements ShortestPaths {
         return path;
     }
 
-    private void create_graph_with_nodes(){
+    private void create_graph_with_nodes(Stations endStation) {
+
+        Map<Stations, Node> stationToNode = new HashMap<>();
+        graph_with_nodes.clear();
+
+        for (Stations station : graphMap.keySet()) {
+            Node node = new Node(station, station.getLocation().getX(), station.getLocation().getY());
+            node.gcost = Double.POSITIVE_INFINITY;
+            node.hcost = calculateHeuristic(node.x, node.y, endStation.getLocation().getX(), endStation.getLocation().getY());
+            node.fcost = Double.POSITIVE_INFINITY;
+            stationToNode.put(station, node);
+            graph_with_nodes.put(node, new ArrayList<>());
+        }
 
         for (Map.Entry<Stations, List<Edge>> entry : graphMap.entrySet()) {
-            Node node = new Node(entry.getKey(), entry.getKey().getLocation().getX(), entry.getKey().getLocation().getY());
-            graph_with_nodes.putIfAbsent(node, new ArrayList<>());
-
-            for(Edge edge : entry.getValue()){
-                Node neighbor = new Node(edge.getDestination(), edge.getDestination().getLocation().getX(), edge.getDestination().getLocation().getY());
-                neighbor.gcost = Double.POSITIVE_INFINITY;
-                neighbor.hcost = calculateHeuristic(neighbor.x, neighbor.y, node.x, node.y);
-                neighbor.fcost = Double.POSITIVE_INFINITY;
-                neighbor.parent = node;
+            Node node = stationToNode.get(entry.getKey());
+            for (Edge edge : entry.getValue()) {
+                Node neighbor = stationToNode.get(edge.getDestination());
                 graph_with_nodes.get(node).add(neighbor);
-
             }
         }
     }
@@ -88,23 +93,25 @@ public class A_star implements ShortestPaths {
     @Override
     public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric) {
 
-        create_graph_with_nodes();
+        create_graph_with_nodes(endStation);
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         HashSet<Node> closedSet = new HashSet<>();
 
-        for (Node graph_node : graph_with_nodes.keySet()){
-            if (graph_node.station.getStationID() == startStation.getStationID()) {
-                graph_node.gcost = 0;
-                graph_node.fcost = graph_node.hcost;
-                openSet.add(graph_node);
-            }
+        Node startNode = graph_with_nodes.keySet().stream()
+                .filter(n -> n.station.getStationID() == startStation.getStationID())
+                .findFirst().orElse(null);
+        if (startNode != null) {
+            startNode.gcost = 0;
+            startNode.fcost = startNode.hcost;
+            openSet.add(startNode);
         }
 
         while (!openSet.isEmpty()) {
 
             Node current = openSet.poll();
+            System.out.println("Current station: " + current.station.getName());
 
-            if (current.x == endStation.getLocation().getX() && current.y == endStation.getLocation().getY()){
+            if (current.station.equals(endStation)){
                 Metrics calculatedMetrics = calculateAllMetrics(followPath(current));
 
                 ArrayList<double[]> paths = new ArrayList<>(followPath(current).stream().map(node -> new double[]{node.x, node.y}).toList());
@@ -113,6 +120,10 @@ public class A_star implements ShortestPaths {
 
             openSet.remove(current);
             closedSet.add(current);
+
+            if (graph_with_nodes.get(current) == null) {
+                continue;
+            }
 
             for (Node neighbor : graph_with_nodes.get(current)){
                 double tentative_gScore = current.gcost + graphMap.get(current.station).stream().filter(station -> station.getDestination().equals(neighbor.station)).findFirst().map(metric.getMetricFunction()).orElse(0.0);

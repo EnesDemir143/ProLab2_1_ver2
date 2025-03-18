@@ -72,7 +72,7 @@ public class Path_Calculate {
 
     public void start_to_end(@RequestBody RequestData frontend_data, Path path){
 
-        double[] startPoint = path.path().getLast();
+        double[] startPoint = path.path().getFirst();
         Point2D.Double point_start = new Point2D.Double(startPoint[0], startPoint[1]);
 
         Boolean walk_control_start = (walkingController.can_proceed(frontend_data.getCurrentLocation().getLocation(), point_start)).getKey();
@@ -101,19 +101,20 @@ public class Path_Calculate {
 
 
         Path path_for_time = aStar.findShortestPaths(startStation, endStation, Metric.TIME);
+        System.out.println("Time: " + path_for_time.time());
         start_to_end(frontend_data, path_for_time);
         last_station_to_end(frontend_data, path_for_time);
-        System.out.println("Time: " + path_for_time.time());
 
         Path path_for_distance = aStar.findShortestPaths(startStation, endStation, Metric.DISTANCE);
-        start_to_end(frontend_data, path_for_distance);
-        last_station_to_end(frontend_data, path_for_distance);
         System.out.println("Distance: " + path_for_distance.distance());
 
+        start_to_end(frontend_data, path_for_distance);
+        last_station_to_end(frontend_data, path_for_distance);
+
         Path path_for_amount = aStar.findShortestPaths(startStation, endStation, Metric.AMOUNT);
+        System.out.println("Amount: " + path_for_amount.amount());
         start_to_end(frontend_data, path_for_amount);
         last_station_to_end(frontend_data, path_for_amount);
-        System.out.println("Amount: " + path_for_amount.amount());
 
 
 
