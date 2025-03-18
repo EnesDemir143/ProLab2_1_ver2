@@ -620,8 +620,8 @@
     let routesHtml = data.routes.map((route, index) => `
       <div class="route-card" onclick="drawPathOnMap(${JSON.stringify(data)}, ${index})" style="cursor: pointer;">
         <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-        <p><strong>Süre:</strong> ${route.duration} dk</p>
-        <p><strong>Tutar:</strong> ${route.price.toFixed(1)} TL</p>
+        <p><strong>Süre:</strong> ${route.time} dk</p>
+        <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
         <p><strong>En İyi:</strong> ${route.bestFor}</p>
       </div>
     `).join('');
