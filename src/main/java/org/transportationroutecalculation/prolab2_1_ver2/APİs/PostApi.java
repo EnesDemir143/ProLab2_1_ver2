@@ -6,6 +6,9 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.RequestBody;
     import org.springframework.web.bind.annotation.RestController;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.*;
+    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.A_star;
+    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
+    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.PathRecords.Path;
     import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
     import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
@@ -20,7 +23,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     @RestController
     public class PostApi {
 
-        private final Dijkstra dijkstra; // Dijkstra algoritmasını enjekte ediyoruz
+        private final Dijkstra dijkstra;
         private final FindNearestStation findNearestStation;
         private final Graph graph;
         private final A_star aStar;
@@ -38,7 +41,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
                 for (int j = 0; j < array[i].length; j++) {
                     System.out.print("data" + array[i][j] + " ");
                 }
-                System.out.println(); // Her satırdan sonra yeni bir satır
+                System.out.println();
             }
         }
 
@@ -47,7 +50,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         @PostMapping("/api/draw_route")
         public ResponseEntity<HashMap <String, List<Route>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
-                // Başlangıç ve hedef noktalarını Stations objelerine çevir
                 Stations startStation = findNearestStation.find_nearest_station(data.getCurrentLocation()).getFirst().stations();
                 System.out.println("Start station: " + startStation.getStationID());
                 Stations endStation = findNearestStation.find_nearest_station(data.getTargetLocation()).getFirst().stations();

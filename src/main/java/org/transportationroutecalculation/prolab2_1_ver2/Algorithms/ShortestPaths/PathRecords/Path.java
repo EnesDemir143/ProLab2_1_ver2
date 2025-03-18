@@ -1,4 +1,4 @@
-package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths;
+package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.PathRecords;
 
 public record Path(double[][] path, double distance, int time, double amount, String best_for) {
 }

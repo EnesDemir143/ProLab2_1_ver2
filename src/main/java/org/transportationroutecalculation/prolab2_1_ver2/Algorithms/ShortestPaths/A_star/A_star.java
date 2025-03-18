@@ -1,19 +1,19 @@
-package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths;
+package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.PathRecords.Metrics;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.ShortestPaths;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Edge;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-record Metrics(double amount, int time, double distance) {}
 
 
 @Service
-public class A_star implements ShortestPaths{
+public class A_star implements ShortestPaths {
 
     private final Graph graph;
     private final Map<Stations, List<Edge>> graphMap;

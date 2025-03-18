@@ -1,4 +1,4 @@
-package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths;
+package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star;
 
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
