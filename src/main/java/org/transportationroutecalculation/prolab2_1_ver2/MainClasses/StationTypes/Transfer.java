@@ -12,6 +12,8 @@ public class Transfer {
     @JsonProperty("transferUcret")
     private Double transfer_amount;
 
+    private Double transfer_distance = 0.0;
+
     @JsonProperty("transferSure")
     private Integer transfer_time;
 
@@ -60,9 +62,19 @@ public class Transfer {
     @Override
     public String toString() {
         return "Transfer{" +
-                "transferStation=" + (transferStation != null ? transferStation.getStationID() : transferStopId) +
+                "transferStopId='" + transferStopId + '\'' +
+                ", transferStation=" + transferStation +
                 ", transfer_amount=" + transfer_amount +
+                ", transfer_distance=" + transfer_distance +
                 ", transfer_time=" + transfer_time +
                 '}';
+    }
+
+    public Double getTransfer_distance() {
+        return transfer_distance;
+    }
+
+    public void setTransfer_distance(Double transfer_distance) {
+        this.transfer_distance = transfer_distance;
     }
 }

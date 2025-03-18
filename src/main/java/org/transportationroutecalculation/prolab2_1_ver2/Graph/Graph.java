@@ -7,6 +7,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Transfer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ public class Graph {
     public Graph(JsonLoad jsonLoad) {
         this.jsonLoad = jsonLoad;
         this.data = jsonLoad.getData();
-        // Veri kontrolü
         System.out.println("Graph: Stations boyutu: " + (data.getStations() != null ? data.getStations().length : "null"));
     }
 
@@ -35,13 +35,17 @@ public class Graph {
 
     public void createGraph() {
             for (Stations station : data.getStations()) {
-            // Create a node for each station
             graph.putIfAbsent(station, new ArrayList<>());
+            }
 
-            // Add edges for stations with next stations
-                for (NextStation destination : station.getNext_stations()) {
-                    addEdge(station, destination.getNextstation(), destination.getDistance(), destination.getAmount(), destination.getTime());
-                    addEdge(destination.getNextstation(), station, destination.getDistance(), destination.getAmount(), destination.getTime()); // Undirected graph için
+            for (Stations station : data.getStations()) {
+                for (NextStation nextStation : station.getNext_stations()) {
+                    addEdge(station, nextStation.getNextstation(), nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime());
+                    addEdge(nextStation.getNextstation(), station, nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime());
+                }
+                for (Transfer transfer : station.getTransfer()) {
+                    addEdge(station, transfer.getTransferStation(), transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time());
+                    addEdge(transfer.getTransferStation(), station, transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time());
                 }
             }
 

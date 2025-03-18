@@ -96,10 +96,6 @@ public class Path_Calculate {
 
         HashMap <String, List<Route>> backEndReturn= new HashMap<>();
 
-        double[] firststation = {frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()};
-        double[] laststation = {frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()};
-
-
         Path path_for_time = aStar.findShortestPaths(startStation, endStation, Metric.TIME);
         System.out.println("Time: " + path_for_time.time());
         start_to_end(frontend_data, path_for_time);
