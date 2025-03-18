@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPat
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Edge;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
