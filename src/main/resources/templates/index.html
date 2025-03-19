@@ -7,8 +7,9 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      background: linear-gradient(135deg, rgba(245, 247, 250, 0.8), rgba(195, 207, 226, 0.8));
       transition: background 0.5s ease;
+      color: #1e3a8a;
     }
 
     body.night-mode {
@@ -34,12 +35,16 @@
       float: left;
       padding: 1rem;
     }
+    .night-mode .controls-container .bg-white {
+      background: #3a3a3a;
+      color: #e0e0e0;
+    }
 
     .coords-display {
       position: fixed;
       bottom: 10px;
       left: 10px;
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 69, 0, 0.8));
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(29, 78, 216, 0.8));
       padding: 0.5rem 1rem;
       border-radius: 2rem;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -52,11 +57,12 @@
     }
 
     .input-field {
-      background: linear-gradient(145deg, #fff7e6, #ffe4e1);
+      background: linear-gradient(145deg, rgba(219, 234, 254, 0.9), rgba(191, 219, 254, 0.9));
       box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.05), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
-      border: 2px solid #ff6f61;
+      border: 2px solid #3b82f6;
       border-radius: 1rem;
       transition: all 0.5s ease;
+      color: #1e40af;
     }
 
     .night-mode .input-field {
@@ -72,7 +78,7 @@
     }
 
     .btn-draw, .toggle-btn, .marker-btn {
-      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      background: linear-gradient(45deg, #3b82f6, #1d4ed8);
       border-radius: 1.5rem;
       transition: all 0.5s ease;
       animation: pulse 2s infinite;
@@ -88,7 +94,7 @@
     }
 
     .navbar {
-      background: linear-gradient(135deg, #ff6f61, #ff1493);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(29, 78, 216, 0.9));
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
       border-radius: 0 0 1rem 1rem;
     }
@@ -103,17 +109,16 @@
     }
 
     .nav-link:hover {
-      color: #facc15;
+      color: #93c5fd;
       transform: translateY(-3px);
     }
 
-    /* Updated Popup Styling */
     .popup {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.9);
-      background: linear-gradient(135deg, rgba(255, 245, 230, 0.95), rgba(255, 200, 220, 0.9));
+      background: linear-gradient(135deg, rgba(219, 234, 254, 0.95), rgba(191, 219, 254, 0.9));
       border-radius: 2rem;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
       padding: 2rem;
@@ -122,8 +127,9 @@
       z-index: 200;
       opacity: 0;
       transition: all 0.4s ease;
-      border: 2px solid #ff6f61;
+      border: 2px solid #3b82f6;
       backdrop-filter: blur(10px);
+      color: #1e40af;
     }
 
     .popup.show {
@@ -137,12 +143,17 @@
       color: #d4d4d8;
     }
 
+    .night-mode .controls-container h2,
+    .night-mode .controls-container label {
+      color: #d8d4d4;
+    }
+
     .popup h3 {
       font-size: 1.75rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
       text-align: center;
-      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      background: linear-gradient(45deg, #3b82f6, #1d4ed8);
       -webkit-background-clip: text;
       color: transparent;
     }
@@ -173,7 +184,7 @@
     }
 
     .popup button {
-      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      background: linear-gradient(45deg, #3b82f6, #1d4ed8);
       color: #fff;
       padding: 0.75rem 1.5rem;
       border-radius: 1.5rem;
@@ -213,7 +224,7 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background: linear-gradient(45deg, #ff6f61, #ff1493);
+      background: linear-gradient(45deg, #3b82f6, #1d4ed8);
       padding: 0.5rem 1rem;
       border-radius: 2rem;
       color: #fff;
@@ -256,11 +267,9 @@
 <!-- Navbar -->
 <nav class="navbar text-white p-6 sticky top-0 z-20">
   <div class="container mx-auto flex justify-between items-center max-w-7xl">
-    <h1 class="text-4xl font-bold tracking-tight bg-gradient-to-r from-yellow-400 to-pink-600 bg-clip-text text-transparent">
+    <h1 class="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
       Path Recommendation System
     </h1>
-
-
   </div>
 </nav>
 
@@ -272,7 +281,7 @@
   <!-- Controls (Left Side) -->
   <div class="controls-container">
     <div class="bg-white night-mode:bg-gray-800 rounded-3xl shadow-xl p-4">
-      <h2 class="text-xl font-bold mb-3 text-gray-800 night-mode:text-gray-200 bg-gradient-to-r from-yellow-400 to-pink-600 bg-clip-text text-transparent">
+      <h2 class="text-xl font-bold mb-3 text-gray-800 night-mode:text-gray-200 bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
         Rota Planlayıcı
       </h2>
 
@@ -299,7 +308,7 @@
 
         <!-- Marker Buttons -->
         <button class="marker-btn mt-4 w-full text-white p-3 font-semibold text-base" onclick="toggleMarker('start')">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s" alt="Start Marker"> Başlangıç Noktası
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s" alt="Start Marker"> Başlangıç Noktası
         </button>
         <div id="start_section" class="dynamic-section">
           <input type="text" id="start_lat" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Başlangıç Enlem (Lat)">
@@ -373,7 +382,6 @@
   var infoWindow;
   var startMarker = null;
   var targetMarker = null;
-  var currentRouteIndex = 0; // Default to distance (index 0)
 
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -567,7 +575,7 @@
               return response.json();
             })
             .then(data => {
-              drawPathOnMap(data, 0); // Default to distance route (index 0)
+              drawPathOnMap(data);
               showRouteInfo(data, requestData);
             })
             .catch(error => {
@@ -576,32 +584,27 @@
   }
 
   function drawPathOnMap(data) {
-    // Clear existing polylines
     polylines.forEach(poly => poly.setMap(null));
     polylines = [];
 
-    // Iterate over each route in the data
     data.routes.forEach((route, index) => {
       const pathCoordinates = route.path.map(coord => ({
         lat: coord.lat,
         lng: coord.lon
       }));
 
-      // Create a polyline for this route
       const routePolyline = new google.maps.Polyline({
         path: pathCoordinates,
         geodesic: true,
-        strokeColor: ['#FF6F61', '#8B5CF6', '#FACC15'][index % 3], // Different colors for each route
+        strokeColor: index === 0 ? '#3b82f6' : '#8b5cf6',
         strokeOpacity: 1.0,
         strokeWeight: 4
       });
 
-      // Add the polyline to the map and store it
       routePolyline.setMap(map);
       polylines.push(routePolyline);
     });
 
-    // Adjust map bounds to fit all paths
     const bounds = new google.maps.LatLngBounds();
     data.routes.forEach(route => {
       route.path.forEach(coord => {
@@ -683,5 +686,5 @@
   }
 </script>
 <script th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${api_key} + '&callback=initMap'}" async defer></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'922dae3edd76bfa9',t:'MTc0MjM5NDc2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
