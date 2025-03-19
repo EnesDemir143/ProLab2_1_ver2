@@ -1,6 +1,7 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Algorithms;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
@@ -12,10 +13,12 @@ import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.WalkingController;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.awt.geom.Point2D;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -30,9 +33,10 @@ public class Path_Calculate {
     private final WalkingController walkingController;
     private final Data data;
     private final JsonLoad jsonLoad;
+    private final DistanceCalculate distanceCalculate;
 
     @Autowired
-    public Path_Calculate(JsonLoad JsonLoad, WalkingController walkingController, Dijkstra dijkstra, A_star aStar , FindNearestStation findNearestStation, Graph graph, JsonLoad jsonLoad) {
+    public Path_Calculate(JsonLoad JsonLoad, WalkingController walkingController, Dijkstra dijkstra, A_star aStar , FindNearestStation findNearestStation, Graph graph, JsonLoad jsonLoad,@Qualifier("haversine") DistanceCalculate distanceCalculate) {
         this.jsonLoad = JsonLoad;
         this.data = jsonLoad.getData();
         this.walkingController = walkingController;
@@ -40,6 +44,7 @@ public class Path_Calculate {
         this.aStar = aStar;
         this.findNearestStation = findNearestStation;
         this.graph = graph;
+        this.distanceCalculate = distanceCalculate;
     }
 
 
@@ -112,17 +117,31 @@ public class Path_Calculate {
         start_to_end(frontend_data, path_for_amount);
         last_station_to_end(frontend_data, path_for_amount);
 
-
+        Path taxi_path = justTaxi(frontend_data);
 
         List<Route> routes = List.of(
-                new Route(convertPathToCoords(path_for_time.path()), new AtomicReference<>(path_for_time.distance().get()), new AtomicReference<>(path_for_time.time().get()), new AtomicReference<>(path_for_time.amount().get()), "Süre (Time)"),
-                new Route(convertPathToCoords(path_for_distance.path()), new AtomicReference<>(path_for_distance.distance().get()), new AtomicReference<>(path_for_distance.time().get()), new AtomicReference<>(path_for_distance.amount().get()), "Mesafe (Distance)"),
-                new Route(convertPathToCoords(path_for_amount.path()), new AtomicReference<>(path_for_amount.distance().get()), new AtomicReference<>(path_for_amount.time().get()), new AtomicReference<>(path_for_amount.amount().get()), "Tutar (Amount)")
+                new Route(convertPathToCoords(path_for_time.path()), new AtomicReference<>(path_for_time.distance().get()), new AtomicReference<>(path_for_time.time().get()), new AtomicReference<>(path_for_time.amount().get()), path_for_time.best_for()),
+                new Route(convertPathToCoords(path_for_distance.path()), new AtomicReference<>(path_for_distance.distance().get()), new AtomicReference<>(path_for_distance.time().get()), new AtomicReference<>(path_for_distance.amount().get()), path_for_distance.best_for()),
+                new Route(convertPathToCoords(path_for_amount.path()), new AtomicReference<>(path_for_amount.distance().get()), new AtomicReference<>(path_for_amount.time().get()), new AtomicReference<>(path_for_amount.amount().get()), path_for_time.best_for()),
+                new Route(convertPathToCoords(taxi_path.path()), new AtomicReference<>(taxi_path.distance().get()), new AtomicReference<>(taxi_path.time().get()), new AtomicReference<>(taxi_path.amount().get()), taxi_path.best_for())
         );
 
         backEndReturn.put("routes", routes);
 
         return backEndReturn;
+    }
+
+    public Path justTaxi(@RequestBody RequestData frontend_data) {
+
+
+        double distance = distanceCalculate.calculateDistance(frontend_data.getCurrentLocation().getLocation(), frontend_data.getTargetLocation().getLocation());
+        ArrayList<double[]> path = new ArrayList<>();
+        path.add(new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()});
+        path.add(new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()});
+
+        Path paths = new Path(path, new AtomicReference<>(distance), new AtomicReference<>(0), new AtomicReference<>(data.getTaxi().calculate_price(distance)), "Taksi (Taxi)");
+
+        return paths;
     }
 
     public HashMap<String, List<Route>> path_calculate(@RequestBody RequestData frontend_data){
@@ -135,6 +154,10 @@ public class Path_Calculate {
         System.out.println("End station: " + endStation.getStationID());
 
         backEndReturn = route_concat(frontend_data, startStation, endStation);
+
+//        if (backEndReturn.get("routes").stream().filter(Objects::isNull).count() == 3) {
+//            backEndReturn = justTaxi(frontend_data);
+//        }
 
         return backEndReturn;
     }

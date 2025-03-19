@@ -34,9 +34,6 @@ public class Graph {
     }
 
     public void createGraph() {
-            for (Stations station : data.getStations()) {
-            graph.putIfAbsent(station, new ArrayList<>());
-            }
 
             for (Stations station : data.getStations()) {
                 for (NextStation nextStation : station.getNext_stations()) {
