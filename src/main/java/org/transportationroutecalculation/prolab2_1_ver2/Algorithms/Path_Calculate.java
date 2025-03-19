@@ -9,9 +9,10 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPath
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.Dijkstra;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.ShortestPaths;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
-import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
+
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.WalkingController;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
@@ -26,24 +27,20 @@ import java.util.stream.Collectors;
 @Service
 public class Path_Calculate {
 
-    private final Dijkstra dijkstra;
     private final FindNearestStation findNearestStation;
-    private final Graph graph;
-    private final A_star aStar;
+    private final ShortestPaths shortestPaths;
     private final WalkingController walkingController;
     private final Data data;
     private final JsonLoad jsonLoad;
     private final DistanceCalculate distanceCalculate;
 
     @Autowired
-    public Path_Calculate(JsonLoad JsonLoad, WalkingController walkingController, Dijkstra dijkstra, A_star aStar , FindNearestStation findNearestStation, Graph graph, JsonLoad jsonLoad,@Qualifier("haversine") DistanceCalculate distanceCalculate) {
+    public Path_Calculate(JsonLoad JsonLoad, WalkingController walkingController, @Qualifier("a_star") ShortestPaths shortestPaths, FindNearestStation findNearestStation ,JsonLoad jsonLoad, @Qualifier("haversine") DistanceCalculate distanceCalculate) {
         this.jsonLoad = JsonLoad;
         this.data = jsonLoad.getData();
         this.walkingController = walkingController;
-        this.dijkstra = dijkstra;
-        this.aStar = aStar;
+        this.shortestPaths = shortestPaths;
         this.findNearestStation = findNearestStation;
-        this.graph = graph;
         this.distanceCalculate = distanceCalculate;
     }
 
@@ -101,18 +98,18 @@ public class Path_Calculate {
 
         HashMap <String, List<Route>> backEndReturn= new HashMap<>();
 
-        Path path_for_time = aStar.findShortestPaths(startStation, endStation, Metric.TIME);
+        Path path_for_time = shortestPaths.findShortestPaths(startStation, endStation, Metric.TIME);
         System.out.println("Time: " + path_for_time.time());
         start_to_end(frontend_data, path_for_time);
         last_station_to_end(frontend_data, path_for_time);
 
-        Path path_for_distance = aStar.findShortestPaths(startStation, endStation, Metric.DISTANCE);
+        Path path_for_distance = shortestPaths.findShortestPaths(startStation, endStation, Metric.DISTANCE);
         System.out.println("Distance: " + path_for_distance.distance());
 
         start_to_end(frontend_data, path_for_distance);
         last_station_to_end(frontend_data, path_for_distance);
 
-        Path path_for_amount = aStar.findShortestPaths(startStation, endStation, Metric.AMOUNT);
+        Path path_for_amount = shortestPaths.findShortestPaths(startStation, endStation, Metric.AMOUNT);
         System.out.println("Amount: " + path_for_amount.amount());
         start_to_end(frontend_data, path_for_amount);
         last_station_to_end(frontend_data, path_for_amount);
@@ -154,10 +151,6 @@ public class Path_Calculate {
         System.out.println("End station: " + endStation.getStationID());
 
         backEndReturn = route_concat(frontend_data, startStation, endStation);
-
-//        if (backEndReturn.get("routes").stream().filter(Objects::isNull).count() == 3) {
-//            backEndReturn = justTaxi(frontend_data);
-//        }
 
         return backEndReturn;
     }
