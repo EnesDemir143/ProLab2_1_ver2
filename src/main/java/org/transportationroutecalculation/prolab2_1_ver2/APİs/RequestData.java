@@ -19,19 +19,18 @@ public class RequestData {
     @JsonProperty("passengers")
     private Optional<Passengers> passenger;
 
-    @JsonProperty("payment_method")
+   @JsonProperty("payment_method")
     private Optional<PaymentMethods> paymentMethod;
 
     public RequestData() {
         this.passenger = Optional.empty();
-        this.paymentMethod = Optional.empty();
     }
 
     public RequestData(CurrentLocation currentLocation, TargetLocation targetLocation, Optional<Passengers> passenger, Optional<PaymentMethods> paymentMethod) {
         this.currentLocation = currentLocation;
         this.targetLocation = targetLocation;
         this.passenger = passenger;
-        this.paymentMethod = paymentMethod;
+        passenger.ifPresent(passengers -> passengers.setPaymentMethod(paymentMethod));
     }
 
     public CurrentLocation getCurrentLocation() {
@@ -58,13 +57,6 @@ public class RequestData {
         this.passenger = passenger;
     }
 
-    public Optional<PaymentMethods> getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(Optional<PaymentMethods> paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
 
     @Override
     public String toString() {
@@ -72,7 +64,6 @@ public class RequestData {
                 "currentLocation=" + currentLocation +
                 ", targetLocation=" + targetLocation +
                 ", passenger=" + passenger +
-                ", paymentMethod=" + paymentMethod +
                 '}';
     }
 }

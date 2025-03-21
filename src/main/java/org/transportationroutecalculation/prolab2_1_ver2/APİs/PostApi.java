@@ -29,6 +29,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         public ResponseEntity<HashMap <String, List<Route>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
                 HashMap <String, List<Route>> backEndReturn = path_calculate.path_calculate(data);
+                data.getPassenger().ifPresent(passengers -> passengers.getPaymentMethod().ifPresent(paymentMethods -> paymentMethods.pay(passengers)));
 
                 return ResponseEntity.ok(backEndReturn);
 
