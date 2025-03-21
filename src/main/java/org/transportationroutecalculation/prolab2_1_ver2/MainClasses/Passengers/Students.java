@@ -11,6 +11,11 @@ public class Students extends Passengers {
         super();
     }
 
+    @Override
+    public double getDiscountRate() {
+        return 0.5;
+    }
+
     @JsonCreator
     public Students(@JsonProperty("nameSurname") String nameSurname, @JsonProperty("student_id") String studentId) {
         super(nameSurname);

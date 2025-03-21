@@ -11,6 +11,11 @@ public class OldPeople extends Passengers {
         super();
     }
 
+    @Override
+    public double getDiscountRate() {
+        return 0.6;
+    }
+
     @JsonCreator
     public OldPeople(@JsonProperty("nameSurname") String nameSurname, @JsonProperty("pass_card") String passCard) {
         super(nameSurname);

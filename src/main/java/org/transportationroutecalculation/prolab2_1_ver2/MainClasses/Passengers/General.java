@@ -14,4 +14,9 @@ public class General extends Passengers {
         super(nameSurname);
     }
 
+    @Override
+    public double getDiscountRate() {
+        return 0;
+    }
+
 }

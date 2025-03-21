@@ -26,4 +26,7 @@ public abstract class Passengers {
     public void setNameSurname(String nameSurname) {
         this.nameSurname = nameSurname;
     }
+
+    public abstract double getDiscountRate();
+
 }
