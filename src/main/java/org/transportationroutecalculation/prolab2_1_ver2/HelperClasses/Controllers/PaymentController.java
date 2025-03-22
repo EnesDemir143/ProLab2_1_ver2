@@ -34,9 +34,10 @@ public class PaymentController extends Controllers{
         for (Route route : mutableRouteList) {
             if (money < 0) {
                 return routes;
-            } else if (money < route.amount().get()) {
+            } else if (money < passenger.getDiscountRate()*(route.amount().get())) {
                 routesToRemove.add(route);
             } else {
+                route.amount().set(passenger.getDiscountRate()*(route.amount().get()));
                 System.out.println("Ödeme başarılı");
             }
         }

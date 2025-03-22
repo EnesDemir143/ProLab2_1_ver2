@@ -16,7 +16,7 @@ public class General extends Passengers {
 
     @Override
     public double getDiscountRate() {
-        return 0;
+        return 1;
     }
 
 }
