@@ -6,7 +6,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
 import java.util.HashMap;
 import java.util.List;
 
-public class Cash extends PaymentMethods{
+public class Cash extends PaymentMethods implements PaymentCalculate{
 
     @JsonProperty("cash")
     private double cash;
@@ -27,17 +27,10 @@ public class Cash extends PaymentMethods{
         this.cash = cash;
     }
 
+
     @Override
-    public double pay() {
+    public double calculateAmount(HashMap<String, List<Route>> routes) {
 
         return 0;
-    }
-
-    @Override
-    public double calculateAmount(HashMap<String, List<Route>> routes, int index) {
-
-        double amount = routes.get("route").get(index).amount().get();
-
-        return amount;
     }
 }

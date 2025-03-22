@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PaymentCalculate {
 
-    double calculateAmount(HashMap<String, List<Route>> routes, int index);
+    double calculateAmount(HashMap<String, List<Route>> routes);
 }

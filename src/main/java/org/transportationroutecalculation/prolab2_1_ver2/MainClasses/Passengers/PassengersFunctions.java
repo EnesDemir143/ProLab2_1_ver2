@@ -8,8 +8,8 @@ import java.util.function.Function;
 
 public enum PassengersFunctions {
 
-    CREDİTCARD(creditCard -> ((CreditCard)creditCard).getLimit()),
-    CİTYCARD(cityCard -> ((CityCard)cityCard).getBalance()),
+    CREDITCARD(creditCard -> ((CreditCard)creditCard).getLimit()),
+    CITYCARD(cityCard -> ((CityCard)cityCard).getBalance()),
     CASH(cash -> ((Cash)cash).getCash());
 
     private final Function<Object, Object> function;
@@ -23,8 +23,8 @@ public enum PassengersFunctions {
 
     public Object getPaymentMethod() {
         return switch (this) {
-            case CREDİTCARD -> "Credit Card";
-            case CİTYCARD -> "City Card";
+            case CREDITCARD -> "Credit Card";
+            case CITYCARD -> "City Card";
             case CASH -> "Cash";
         };
     }

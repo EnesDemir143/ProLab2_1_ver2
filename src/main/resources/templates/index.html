@@ -584,8 +584,18 @@
   }
 
   function drawPathOnMap(data) {
+    // Önceki polyline'ları temizle
     polylines.forEach(poly => poly.setMap(null));
     polylines = [];
+
+    // Rota başına renkler tanımla (isteğe bağlı olarak genişletebilirsiniz)
+    const routeColors = [
+      '#FF6F61', // Kırmızı-turuncu (1. rota)
+      '#8B5CF6', // Mor (2. rota)
+      '#10B981', // Yeşil (3. rota)
+      '#F59E0B', // Sarı-turuncu (4. rota)
+      '#3B82F6', // Mavi (5. rota)
+    ];
 
     data.routes.forEach((route, index) => {
       const pathCoordinates = route.path.map(coord => ({
@@ -593,10 +603,13 @@
         lng: coord.lon
       }));
 
+      // Her rota için renk seçimi (eğer index routeColors dizisinin dışına çıkarsa varsayılan renk kullanılır)
+      const strokeColor = routeColors[index] || '#999999'; // Varsayılan gri renk
+
       const routePolyline = new google.maps.Polyline({
         path: pathCoordinates,
         geodesic: true,
-        strokeColor: index === 0 ? '#3b82f6' : '#8b5cf6',
+        strokeColor: strokeColor,
         strokeOpacity: 1.0,
         strokeWeight: 4
       });
@@ -605,6 +618,7 @@
       polylines.push(routePolyline);
     });
 
+    // Haritayı rotalara göre yeniden boyutlandır
     const bounds = new google.maps.LatLngBounds();
     data.routes.forEach(route => {
       route.path.forEach(coord => {

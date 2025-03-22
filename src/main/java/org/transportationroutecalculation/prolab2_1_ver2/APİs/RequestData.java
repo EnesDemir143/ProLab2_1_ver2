@@ -24,13 +24,15 @@ public class RequestData {
 
     public RequestData() {
         this.passenger = Optional.empty();
+        this.paymentMethod = Optional.empty();
     }
 
     public RequestData(CurrentLocation currentLocation, TargetLocation targetLocation, Optional<Passengers> passenger, Optional<PaymentMethods> paymentMethod) {
         this.currentLocation = currentLocation;
         this.targetLocation = targetLocation;
         this.passenger = passenger;
-        passenger.ifPresent(passengers -> passengers.setPaymentMethod(paymentMethod));
+        this.paymentMethod = paymentMethod;
+        this.passenger.ifPresent(passengers -> passengers.setPaymentMethod(this.paymentMethod));
     }
 
     public CurrentLocation getCurrentLocation() {
@@ -55,8 +57,17 @@ public class RequestData {
 
     public void setPassenger(Optional<Passengers> passenger) {
         this.passenger = passenger;
+        this.passenger.ifPresent(passengers -> passengers.setPaymentMethod(this.paymentMethod));
     }
 
+    public Optional<PaymentMethods> getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(Optional<PaymentMethods> paymentMethod) {
+        this.paymentMethod = paymentMethod;
+        this.passenger.ifPresent(passengers -> passengers.setPaymentMethod(this.paymentMethod));
+    }
 
     @Override
     public String toString() {

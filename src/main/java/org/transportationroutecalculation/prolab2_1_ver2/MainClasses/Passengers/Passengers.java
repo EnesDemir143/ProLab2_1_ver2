@@ -3,7 +3,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.Payment.PaymentMethods;
 
 import java.util.Optional;
@@ -14,13 +13,15 @@ import java.util.Optional;
         @JsonSubTypes.Type(value = Students.class, name = "student"),
         @JsonSubTypes.Type(value = OldPeople.class, name = "old")
 })
-@Service
 public abstract class Passengers {
+
+    @JsonProperty("nameSurname")
     private String nameSurname;
 
     private Optional<PaymentMethods> paymentMethod;
 
     public Passengers() {
+        this.paymentMethod = Optional.empty();
     }
 
     public Passengers(String nameSurname) {
@@ -35,13 +36,13 @@ public abstract class Passengers {
         this.nameSurname = nameSurname;
     }
 
-    public int getMoney() {
-        return paymentMethod
-                .map(pm -> PassengersFunctions.valueOf(pm.getClass().getSimpleName().toUpperCase()).getFunction().apply(pm))
-                .map(value -> value instanceof Number ? ((Number) value).intValue() : 0)
-                .orElse(0);
+    public double getMoney() {
+        return (double) paymentMethod
+                .map(pm -> {
+                    PassengersFunctions function = PassengersFunctions.valueOf(pm.getClass().getSimpleName().toUpperCase());
+                    return function.getFunction().apply(pm);
+                }).orElse(0.0);
     }
-
     public Optional<PaymentMethods> getPaymentMethod() {
         return paymentMethod;
     }

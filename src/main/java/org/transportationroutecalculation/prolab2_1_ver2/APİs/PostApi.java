@@ -7,14 +7,20 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.RestController;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Path_Calculate;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
+    import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PaymentController;
+    import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.General;
+    import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
+    import org.transportationroutecalculation.prolab2_1_ver2.Payment.Cash;
+    import org.transportationroutecalculation.prolab2_1_ver2.Payment.CreditCard;
 
 
     import java.security.Principal;
     import java.util.HashMap;
     import java.util.List;
+    import java.util.Optional;
 
 
-    @RestController
+@RestController
     public class PostApi {
 
         private final Path_Calculate path_calculate;
@@ -29,7 +35,9 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         public ResponseEntity<HashMap <String, List<Route>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
                 HashMap <String, List<Route>> backEndReturn = path_calculate.path_calculate(data);
-                data.getPassenger().ifPresent(passengers -> passengers.getPaymentMethod().ifPresent(paymentMethods -> paymentMethods.pay(passengers)));
+                
+                PaymentController paymentController = new PaymentController(data.getPassenger().orElse(null));
+                backEndReturn=paymentController.PayControl(backEndReturn);
 
                 return ResponseEntity.ok(backEndReturn);
 
