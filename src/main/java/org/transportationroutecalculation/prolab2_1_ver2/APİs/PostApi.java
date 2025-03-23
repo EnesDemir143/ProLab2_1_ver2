@@ -8,10 +8,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Path_Calculate;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PaymentController;
-    import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.General;
-    import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
-    import org.transportationroutecalculation.prolab2_1_ver2.Payment.Cash;
-    import org.transportationroutecalculation.prolab2_1_ver2.Payment.CreditCard;
 
 
     import java.security.Principal;

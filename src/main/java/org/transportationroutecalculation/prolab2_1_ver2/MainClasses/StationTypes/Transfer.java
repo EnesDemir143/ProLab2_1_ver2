@@ -18,7 +18,6 @@ public class Transfer {
     private Integer transfer_time;
 
     public Transfer() {
-        // Default constructor for Jackson
     }
 
     public Transfer(String transferStopId, Double transfer_amount, Integer transfer_time) {

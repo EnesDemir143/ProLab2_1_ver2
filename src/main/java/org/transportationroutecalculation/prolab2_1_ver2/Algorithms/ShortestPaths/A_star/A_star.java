@@ -18,56 +18,17 @@ public class A_star implements ShortestPaths {
 
     private final Graph graph;
     private final Map<Stations, List<Edge>> graphMap;
-    private static Map<Node, List<Node>> graph_with_nodes = new HashMap<>();
+    private final AstarGraph astarGraph;
 
     @Autowired
-    public A_star(Graph graph) {
+    public A_star(Graph graph, AstarGraph astarGraph) {
+        this.astarGraph = astarGraph;
         this.graph = graph;
         this.graphMap = this.graph.getGraph();
         if (graphMap.isEmpty()) {
             System.err.println("A_star: Graph boş! Veriler yüklenmedi.");
         } else {
             System.out.println("A_star: Graph başarıyla yüklendi, durak sayısı: " + graph.getGraph().size());
-        }
-    }
-
-
-
-    private double calculateHeuristic(double x1, double y1, double x2, double y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    }
-
-    private List<Node> followPath(Node node) {
-        List<Node> path = new ArrayList<>();
-        Node current = node;
-        while (current != null) {
-            path.add(current);
-            current = current.parent;
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
-    private void create_graph_with_nodes(Stations endStation) {
-
-        Map<Stations, Node> stationToNode = new HashMap<>();
-        graph_with_nodes.clear();
-
-        for (Stations station : graphMap.keySet()) {
-            Node node = new Node(station, station.getLocation().getX(), station.getLocation().getY());
-            node.gcost = Double.POSITIVE_INFINITY;
-            node.hcost = calculateHeuristic(node.x, node.y, endStation.getLocation().getX(), endStation.getLocation().getY());
-            node.fcost = Double.POSITIVE_INFINITY;
-            stationToNode.put(station, node);
-            graph_with_nodes.put(node, new ArrayList<>());
-        }
-
-        for (Map.Entry<Stations, List<Edge>> entry : graphMap.entrySet()) {
-            Node node = stationToNode.get(entry.getKey());
-            for (Edge edge : entry.getValue()) {
-                Node neighbor = stationToNode.get(edge.getDestination());
-                graph_with_nodes.get(node).add(neighbor);
-            }
         }
     }
 
@@ -90,10 +51,22 @@ public class A_star implements ShortestPaths {
     }
 
 
+    private List<Node> followPath(Node node) {
+        List<Node> path = new ArrayList<>();
+        Node current = node;
+        while (current != null) {
+            path.add(current);
+            current = current.parent;
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+
     @Override
     public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric) {
 
-        create_graph_with_nodes(endStation);
+        Map<Node, List<Node>> graph_with_nodes = astarGraph.create_graph_with_nodes(endStation);
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         HashSet<Node> closedSet = new HashSet<>();
 

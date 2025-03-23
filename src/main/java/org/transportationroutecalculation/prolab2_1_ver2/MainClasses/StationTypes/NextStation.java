@@ -19,7 +19,6 @@ public class NextStation {
     private Integer time;
 
     public NextStation() {
-        // Default constructor for Jackson
     }
 
     public NextStation(String stopId, Double distance, Double amount, Integer time) {

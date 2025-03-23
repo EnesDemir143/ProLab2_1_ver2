@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Service
 public class WalkingController extends Controllers {
-    private static final Double MAX_WALKING_DISTANCE = 1.0;
+    private static final Double MAX_WALKING_DISTANCE = 3.0;
 
     private DistanceCalculate distanceCalculate;
 

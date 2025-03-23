@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTyp
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-public class BusStation extends Stations {
+public class    BusStation extends Stations {
 
     public BusStation() {
         super();
