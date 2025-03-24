@@ -24,12 +24,14 @@ public class RouteConcat {
     private final ShortestPaths shortestPaths;
     private final TaxiPath taxiPath;
     private final BeforeAndAfterTheStations beforeAndAfterTheStations;
+    private final AlternativePath alternativePath;
 
     @Autowired
-    public RouteConcat(TaxiPath taxiPath, @Qualifier("a_star") ShortestPaths shortestPaths, BeforeAndAfterTheStations beforeAndAfterTheStations) {
+    public RouteConcat(TaxiPath taxiPath, @Qualifier("a_star") ShortestPaths shortestPaths, BeforeAndAfterTheStations beforeAndAfterTheStations, @Qualifier("taxi") AlternativePath alternativePath) {
         this.shortestPaths = shortestPaths;
         this.taxiPath = taxiPath;
         this.beforeAndAfterTheStations = beforeAndAfterTheStations;
+        this.alternativePath = alternativePath;
     }
 
     public static List<Map<String, Double>> convertPathToCoords(List<double[]> path) {
@@ -66,8 +68,8 @@ public class RouteConcat {
             routes.add(new Route(convertPathToCoords(path.path()), new AtomicReference<>(path.distance().get()), new AtomicReference<>(path.time().get()), new AtomicReference<>(path.amount().get()), path.best_for()));
         }
 
-        Path taxi_path = taxiPath.justTaxi(frontend_data);
-        routes.add(new Route(convertPathToCoords(taxi_path.path()), new AtomicReference<>(taxi_path.distance().get()), new AtomicReference<>(taxi_path.time().get()), new AtomicReference<>(taxi_path.amount().get()), taxi_path.best_for()));
+        Path alternative_path = alternativePath.calculatePath(frontend_data);
+        routes.add(new Route(convertPathToCoords(alternative_path.path()), new AtomicReference<>(alternative_path.distance().get()), new AtomicReference<>(alternative_path.time().get()), new AtomicReference<>(alternative_path.amount().get()), alternative_path.best_for()));
 
         backEndReturn.put("routes", routes);
 

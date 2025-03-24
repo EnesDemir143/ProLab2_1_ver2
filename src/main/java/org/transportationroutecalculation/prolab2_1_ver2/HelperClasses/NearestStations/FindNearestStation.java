@@ -20,7 +20,7 @@ public class FindNearestStation {
     private final DistanceCalculate distanceCalculate;
 
     @Autowired
-    public FindNearestStation (JsonLoad jsonLoad,@Qualifier("euclidean") DistanceCalculate distanceCalculate) {
+    public FindNearestStation (JsonLoad jsonLoad,@Qualifier("haversine") DistanceCalculate distanceCalculate) {
         this.data = jsonLoad.getData();
         this.distanceCalculate = distanceCalculate;
     }
