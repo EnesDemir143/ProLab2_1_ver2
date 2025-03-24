@@ -7,10 +7,13 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.RestController;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Path_Calculate;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
+    import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PassengetController;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PaymentController;
+    import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
 
 
     import java.security.Principal;
+    import java.util.ArrayList;
     import java.util.HashMap;
     import java.util.List;
     import java.util.Optional;
@@ -20,6 +23,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     public class PostApi {
 
         private final Path_Calculate path_calculate;
+        private HashMap<String ,RequestData> requestDataList = new HashMap<>();
 
         @Autowired
         public PostApi(Path_Calculate path_calculate) {
@@ -30,6 +34,11 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         @PostMapping("/api/draw_route")
         public ResponseEntity<HashMap <String, List<Route>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
+
+                data = new PassengetController().passengerControl(requestDataList, data);
+
+                requestDataList.put(data.getPassenger().map(Passengers::getNameSurname).orElse(" "), data);
+
                 HashMap <String, List<Route>> backEndReturn = path_calculate.path_calculate(data);
                 
                 PaymentController paymentController = new PaymentController(data.getPassenger().orElse(null));
@@ -44,4 +53,4 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
             }
         }
 
-    }
+}
