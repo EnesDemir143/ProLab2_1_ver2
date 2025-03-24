@@ -71,7 +71,7 @@ public class A_star implements ShortestPaths {
         HashSet<Node> closedSet = new HashSet<>();
 
         Node startNode = graph_with_nodes.keySet().stream()
-                .filter(n -> n.station.getStationID() == startStation.getStationID())
+                .filter(n -> Objects.equals(n.station.getStationID(), startStation.getStationID()))
                 .findFirst().orElse(null);
         if (startNode != null) {
             startNode.gcost = 0;

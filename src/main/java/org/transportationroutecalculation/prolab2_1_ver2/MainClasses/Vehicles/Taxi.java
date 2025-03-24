@@ -10,9 +10,19 @@ public class Taxi extends Vehicles {
     @JsonProperty("costPerKm")
     private Double cost_per_km;
 
+    private int time;
+
     @Override
     public String getType() {
         return "Taxi";
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
     }
 
     public Double getOpening_fee() {

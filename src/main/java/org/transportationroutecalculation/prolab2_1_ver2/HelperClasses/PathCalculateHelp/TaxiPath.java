@@ -9,6 +9,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPath
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.TaxiTime;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,7 +36,7 @@ public class TaxiPath {
         path.add(new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()});
         path.add(new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()});
 
-        Path paths = new Path(path, new AtomicReference<>(distance), new AtomicReference<>(0), new AtomicReference<>(data.getTaxi().calculate_price(distance)), "Taksi (Taxi)");
+        Path paths = new Path(path, new AtomicReference<>(distance), new AtomicReference<>(new TaxiTime().calculateTime(distance)), new AtomicReference<>(data.getTaxi().calculate_price(distance)), "Taksi (Taxi)");
 
         return paths;
     }

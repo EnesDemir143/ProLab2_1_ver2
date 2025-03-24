@@ -67,16 +67,16 @@ public abstract class Stations {
     public void setTransfer(Object transfer) {
         System.out.println("setTransfer called with: " + transfer);
         if (transfer == null) {
-            this.transfer = new ArrayList<>();
-        } else if (transfer instanceof ArrayList) {
-            this.transfer = (ArrayList<Transfer>) transfer;
-        } else if (transfer instanceof LinkedHashMap) {
+            return;
+        }
+        if (transfer instanceof ArrayList<?> arrayList) {
+            this.transfer = new ArrayList<>((ArrayList<Transfer>) arrayList);
+        } else if (transfer instanceof LinkedHashMap<?, ?>) {
             Transfer singleTransfer = mapper.convertValue(transfer, Transfer.class);
-            this.transfer = new ArrayList<>(Collections.singletonList(singleTransfer));
-        } else if (transfer instanceof Transfer) {
-            this.transfer = new ArrayList<>(Collections.singletonList((Transfer) transfer));
+            this.transfer.add(singleTransfer);
+        } else if (transfer instanceof Transfer singleTransfer) {
+            this.transfer.add(singleTransfer);
         } else {
-            this.transfer = new ArrayList<>();
             System.out.println("Unexpected transfer type: " + transfer.getClass());
         }
     }
