@@ -37,11 +37,13 @@ public abstract class Passengers {
     }
 
     public double getMoney() {
-        return (double) paymentMethod
+        return paymentMethod
                 .map(pm -> {
                     PassengersFunctions function = PassengersFunctions.valueOf(pm.getClass().getSimpleName().toUpperCase());
-                    return function.getFunction().apply(pm);
-                }).orElse(0.0);
+                    Number result = (Number) function.getFunction().apply(pm);
+                    return result.doubleValue();
+                })
+                .orElse(0.0);
     }
     public Optional<PaymentMethods> getPaymentMethod() {
         return paymentMethod;

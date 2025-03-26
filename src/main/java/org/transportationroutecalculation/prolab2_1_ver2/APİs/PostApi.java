@@ -35,7 +35,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         public ResponseEntity<HashMap <String, List<Route>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
 
-                data = new PassengetController().passengerControl(requestDataList, data);
+               // data = new PassengetController().passengerControl(requestDataList, data);
 
                 requestDataList.put(data.getPassenger().map(Passengers::getNameSurname).orElse(" "), data);
 
