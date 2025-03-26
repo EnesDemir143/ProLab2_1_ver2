@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
+import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.Locations;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
@@ -20,8 +21,8 @@ public class FindNearestStation {
     private final DistanceCalculate distanceCalculate;
 
     @Autowired
-    public FindNearestStation (JsonLoad jsonLoad,@Qualifier("haversine") DistanceCalculate distanceCalculate) {
-        this.data = jsonLoad.getData();
+    public FindNearestStation (JsonLoadService jsonLoadService, @Qualifier("haversine") DistanceCalculate distanceCalculate) {
+        this.data = jsonLoadService.getData();
         this.distanceCalculate = distanceCalculate;
     }
 

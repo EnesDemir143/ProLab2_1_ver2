@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
-import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
+import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.ArrayList;
@@ -21,11 +21,13 @@ public class GetApi {
     private String apiKey;
 
     private final Data data;
+    private final JsonLoadService jsonLoadService;
     private List<Map<String, Object>> stationsList = new ArrayList<>();
 
     @Autowired
-    public GetApi(JsonLoad jsonLoad) {
-         this.data = jsonLoad.getData();
+    public GetApi(JsonLoadService jsonLoadService ) {
+        this.jsonLoadService = jsonLoadService;
+        this.data = jsonLoadService.getData();
     }
 
     @GetMapping("/")

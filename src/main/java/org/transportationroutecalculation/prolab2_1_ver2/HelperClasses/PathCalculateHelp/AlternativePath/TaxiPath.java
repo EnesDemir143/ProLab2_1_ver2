@@ -1,25 +1,29 @@
-package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp;
+package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
-import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
+import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativeTimeCalculate.TaxiTimeCalculator;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Component
+@Service
 @Qualifier("taxi")
-public class TaxiPath extends AlternativePath{
+public class TaxiPath extends AlternativePath {
+
+    private final TaxiTimeCalculator taxiTimeCalculator;
 
     @Autowired
-    public TaxiPath(@Qualifier("haversine") DistanceCalculate distanceCalculate, JsonLoad JsonLoad) {
-        super(distanceCalculate, JsonLoad);
+    public TaxiPath(@Qualifier("haversine") DistanceCalculate distanceCalculate, JsonLoadService jsonLoadService, TaxiTimeCalculator taxiTimeCalculator) {
+        super(distanceCalculate, jsonLoadService);
+        this.taxiTimeCalculator = taxiTimeCalculator;
+
     }
 
     @Override
@@ -29,10 +33,9 @@ public class TaxiPath extends AlternativePath{
         path.add(new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()});
         path.add(new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()});
 
-        Path paths = new Path(path, new AtomicReference<>(distance), new AtomicReference<>(new TaxiTime().calculateTime(distance)), new AtomicReference<>(getData().getTaxi().calculate_price(distance)), "Taksi (Taxi)");
+        Path paths = new Path(path, new AtomicReference<>(distance), new AtomicReference<>(taxiTimeCalculator.calculateTime(distance)), new AtomicReference<>(getData().getTaxi().calculate_price(distance)), "Taksi (Taxi)");
         System.out.println(paths.distance().get());
         return paths;
     }
-
 
 }

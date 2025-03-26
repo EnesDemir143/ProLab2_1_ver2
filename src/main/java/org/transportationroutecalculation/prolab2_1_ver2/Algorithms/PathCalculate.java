@@ -6,20 +6,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
-import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteConcat;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteConcat;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.*;
 
 
 @Service
-public class Path_Calculate {
+public class PathCalculate {
 
     private final FindNearestStation findNearestStation;
     private final RouteConcat routeConcat;
 
     @Autowired
-    public Path_Calculate(FindNearestStation findNearestStation, RouteConcat routeConcat) {
+    public PathCalculate(FindNearestStation findNearestStation, RouteConcat routeConcat) {
         this.findNearestStation = findNearestStation;
         this.routeConcat = routeConcat;
     }

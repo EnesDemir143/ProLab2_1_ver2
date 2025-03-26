@@ -5,7 +5,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.PostMapping;
     import org.springframework.web.bind.annotation.RequestBody;
     import org.springframework.web.bind.annotation.RestController;
-    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Path_Calculate;
+    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.PathCalculate;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PassengetController;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PaymentController;
@@ -22,11 +22,11 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 @RestController
     public class PostApi {
 
-        private final Path_Calculate path_calculate;
+        private final PathCalculate path_calculate;
         private HashMap<String ,RequestData> requestDataList = new HashMap<>();
 
         @Autowired
-        public PostApi(Path_Calculate path_calculate) {
+        public PostApi(PathCalculate path_calculate) {
             this.path_calculate = path_calculate;
         }
 

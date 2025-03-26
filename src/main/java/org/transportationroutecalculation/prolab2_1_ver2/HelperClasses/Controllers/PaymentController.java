@@ -29,7 +29,6 @@ public class PaymentController extends Controllers{
         List<Route> routesToRemove = new ArrayList<>();
 
         double money = passenger.getMoney();
-        System.out.println("asdasdadd"+money);
 
         for (Route route : mutableRouteList) {
             if (money < 0) {

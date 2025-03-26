@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
-import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoad;
+import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Transfer;
@@ -18,13 +18,13 @@ import java.util.Map;
 public class Graph {
 
     private Map<Stations, List<Edge>> graph = new HashMap<>();
-    private final JsonLoad jsonLoad;
+    private final JsonLoadService jsonLoadService;
     private final Data data;
 
     @Autowired
-    public Graph(JsonLoad jsonLoad) {
-        this.jsonLoad = jsonLoad;
-        this.data = jsonLoad.getData();
+    public Graph(JsonLoadService jsonLoadService) {
+        this.jsonLoadService = jsonLoadService;
+        this.data = jsonLoadService.getData();
         System.out.println("Graph: Stations boyutu: " + (data.getStations() != null ? data.getStations().length : "null"));
     }
 
