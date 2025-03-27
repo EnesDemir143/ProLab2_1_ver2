@@ -87,7 +87,11 @@ public class A_star implements ShortestPaths {
             if (current.station.equals(endStation)){
                 Metrics calculatedMetrics = calculateAllMetrics(followPath(current));
 
-                ArrayList<double[]> paths = new ArrayList<>(followPath(current).stream().map(node -> new double[]{node.x, node.y}).toList());
+                Deque<Map.Entry<String, double[]>> paths = new LinkedList<>();
+                followPath(current)
+                        .forEach(node ->
+                                paths.add(Map.entry(node.station.getStationType(), new double[]{node.x, node.y}))
+                        );
                 return new Path(paths,new AtomicReference<>(calculatedMetrics.distance()),new AtomicReference<>(calculatedMetrics.time()),new AtomicReference<>(calculatedMetrics.amount()), (String) metric.getMetricName());
             }
 

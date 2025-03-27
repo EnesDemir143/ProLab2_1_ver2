@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class RouteBuilder {
     public static Route buildFromPath(Path path) {
         return new Route(
-                PathConverter.convertPathToCoords(path.path()),
+                path.path(),
                 new AtomicReference<>(path.distance().get()),
                 new AtomicReference<>(path.time().get()),
                 new AtomicReference<>(path.amount().get()),

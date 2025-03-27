@@ -116,14 +116,14 @@
     .popup {
       position: fixed;
       top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
+      right: 2rem;
+      transform: translateY(-50%) scale(0.9);
       background: linear-gradient(135deg, rgba(219, 234, 254, 0.95), rgba(191, 219, 254, 0.9));
       border-radius: 2rem;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
       padding: 2rem;
-      max-width: 500px;
-      width: 90%;
+      max-width: 400px;
+      width: 25vw;
       z-index: 200;
       opacity: 0;
       transition: all 0.4s ease;
@@ -134,7 +134,7 @@
 
     .popup.show {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translateY(-50%) scale(1);
     }
 
     .night-mode .popup {
@@ -208,7 +208,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0);
       z-index: 100;
       opacity: 0;
       transition: opacity 0.4s ease;
@@ -217,7 +217,7 @@
 
     .overlay.show {
       opacity: 1;
-      pointer-events: auto;
+      pointer-events: none;
     }
 
     .mode-toggle {
@@ -362,7 +362,7 @@
   <div id="routeInfo" class="space-y-3"></div>
   <button onclick="closePopup()">Kapat</button>
 </div>
-<div id="overlay" class="overlay" onclick="closePopup()"></div>
+<div id="overlay" class="overlay"></div>
 
 <script th:inline="javascript">
   function toggleMode() {
@@ -378,10 +378,12 @@
 
   var stops = /*[[${stops}]]*/ [];
   var map;
-  var polylines = [];
+  var currentPolyline = null;
   var infoWindow;
   var startMarker = null;
   var targetMarker = null;
+  var allRoutesData = null; // Store all routes data globally
+  var requestDataGlobal = null; // Store request data globally
 
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -575,99 +577,153 @@
               return response.json();
             })
             .then(data => {
-              drawPathOnMap(data);
-              showRouteInfo(data, requestData);
+              allRoutesData = data; // Store data globally
+              requestDataGlobal = requestData; // Store request data globally
+              showRouteInfo(data, requestData); // Show all routes initially
             })
             .catch(error => {
               alert('Rota çizilirken bir hata oluştu: ' + error.message);
             });
   }
 
-  function drawPathOnMap(data) {
-    // Önceki polyline'ları temizle
-    polylines.forEach(poly => poly.setMap(null));
-    polylines = [];
+  function determineRouteColor(route) {
+    const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
+    const uniqueTypes = [...new Set(transportTypes)];
 
-    // Rota başına renkler tanımla (isteğe bağlı olarak genişletebilirsiniz)
-    const routeColors = [
-      '#FF6F61', // Kırmızı-turuncu (1. rota)
-      '#8B5CF6', // Mor (2. rota)
-      '#10B981', // Yeşil (3. rota)
-      '#F59E0B', // Sarı-turuncu (4. rota)
-      '#3B82F6', // Mavi (5. rota)
-    ];
+    if (uniqueTypes.length === 1 && uniqueTypes[0] === 'taxi') {
+      return '#F59E0B'; // Yellow for taxi-only
+    } else if (transportTypes.includes('walk')) {
+      return '#3B82F6'; // Blue for routes with walk
+    } else if (uniqueTypes.length === 1 && (uniqueTypes[0] === 'bus' || uniqueTypes[0] === 'tram')) {
+      return '#10B981'; // Green for same transport (bus or tram)
+    } else {
+      return '#8B5CF6'; // Purple for mixed transport
+    }
+  }
 
-    data.routes.forEach((route, index) => {
-      const pathCoordinates = route.path.map(coord => ({
-        lat: coord.lat,
-        lng: coord.lon
-      }));
+  function drawPathOnMap(data, routeIndex) {
+    if (currentPolyline) {
+      currentPolyline.setMap(null);
+    }
 
-      // Her rota için renk seçimi (eğer index routeColors dizisinin dışına çıkarsa varsayılan renk kullanılır)
-      const strokeColor = routeColors[index] || '#999999'; // Varsayılan gri renk
-
-      const routePolyline = new google.maps.Polyline({
-        path: pathCoordinates,
-        geodesic: true,
-        strokeColor: strokeColor,
-        strokeOpacity: 1.0,
-        strokeWeight: 4
-      });
-
-      routePolyline.setMap(map);
-
-      // Her rota için bir InfoWindow oluştur
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-        <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
-          <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Rota ${index + 1}</h4>
-        <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-        <p><strong>Süre:</strong> ${route.time} dk</p>
-        <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-        <p><strong>En İyi:</strong> ${route.bestFor}</p>
-      </div>
-        </div>
-      `
-      });
-
-      // Mouseover ile InfoWindow'u göster
-      google.maps.event.addListener(routePolyline, 'mouseover', function(event) {
-        infoWindow.setPosition(event.latLng);
-        infoWindow.open(map);
-      });
-
-      // Mouseout ile InfoWindow'u kapat
-      google.maps.event.addListener(routePolyline, 'mouseout', function() {
-        infoWindow.close();
-      });
-
-      polylines.push(routePolyline);
+    const route = data.routes[routeIndex];
+    const pathCoordinates = route.path.map(segment => {
+      const type = Object.keys(segment)[0];
+      const coords = segment[type];
+      return { lat: coords[0], lng: coords[1] };
     });
 
-    // Haritayı rotalara göre yeniden boyutlandır
+    const strokeColor = determineRouteColor(route);
+
+    currentPolyline = new google.maps.Polyline({
+      path: pathCoordinates,
+      geodesic: true,
+      strokeColor: strokeColor,
+      strokeOpacity: 1.0,
+      strokeWeight: 4
+    });
+
+    currentPolyline.setMap(map);
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
+          <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Rota ${routeIndex + 1}</h4>
+          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+          <p><strong>Süre:</strong> ${route.time} dk</p>
+          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+          <p><strong>En İyi:</strong> ${route.bestFor}</p>
+        </div>
+      `,
+    });
+
+    google.maps.event.addListener(currentPolyline, 'mouseover', function(event) {
+      infoWindow.setPosition(event.latLng);
+      infoWindow.open(map);
+    });
+
+    google.maps.event.addListener(currentPolyline, 'mouseout', function() {
+      infoWindow.close();
+    });
+
     const bounds = new google.maps.LatLngBounds();
-    data.routes.forEach(route => {
-      route.path.forEach(coord => {
-        bounds.extend(new google.maps.LatLng(coord.lat, coord.lon));
-      });
+    pathCoordinates.forEach(coord => {
+      bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
     });
     map.fitBounds(bounds);
   }
 
-  function showRouteInfo(data, requestData) {
+  function showRouteInfo(data, requestData, selectedRouteIndex = null) {
     const passengerType = requestData.passengers.type;
     const nameSurname = requestData.passengers.nameSurname;
     const paymentType = requestData.payment_method.type;
     const paymentMethod = requestData.payment_method;
 
-    let routesHtml = data.routes.map((route, index) => `
-      <div class="route-card" onclick="drawPathOnMap(${JSON.stringify(data)}, ${index})" style="cursor: pointer;">
-        <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-        <p><strong>Süre:</strong> ${route.time} dk</p>
-        <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-        <p><strong>En İyi:</strong> ${route.bestFor}</p>
-      </div>
-    `).join('');
+    // Function to get transport icon
+    function getTransportIcon(route) {
+      const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
+      const uniqueTypes = [...new Set(transportTypes)];
+      return uniqueTypes.map(type => {
+        switch(type) {
+          case 'walk': return '🚶';
+          case 'bus': return '🚌';
+          case 'tram': return '🚊';
+          case 'taxi': return '🚕';
+          default: return '🛣️';
+        }
+      }).join(' ');
+    }
+
+    let routesHtml = '';
+    let detailedRouteInfo = '';
+
+    if (selectedRouteIndex === null) {
+      // Show all routes initially
+      routesHtml = data.routes.map((route, index) => `
+        <div class="route-card route-selector" onclick="showRouteInfo(allRoutesData, requestDataGlobal, ${index})" data-route-index="${index}">
+          <p><strong>Rota ${index + 1} ${getTransportIcon(route)}</strong></p>
+          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+          <p><strong>Süre:</strong> ${route.time} dk</p>
+          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+          <p><strong>En İyi:</strong> ${route.bestFor}</p>
+        </div>
+      `).join('');
+    } else {
+      // Show selected route with details
+      const route = data.routes[selectedRouteIndex];
+      routesHtml = data.routes.map((route, index) => `
+        <div class="route-card route-selector ${index === selectedRouteIndex ? 'bg-blue-100 dark:bg-gray-700' : ''}"
+             onclick="showRouteInfo(allRoutesData, requestDataGlobal, ${index})"
+             data-route-index="${index}">
+          <p><strong>Rota ${index + 1} ${getTransportIcon(route)}</strong></p>
+          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+          <p><strong>Süre:</strong> ${route.time} dk</p>
+          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+          <p><strong>En İyi:</strong> ${route.bestFor}</p>
+        </div>
+      `).join('');
+
+      detailedRouteInfo = route.path.map((segment, index) => {
+        const transportType = Object.keys(segment)[0];
+        const coords = segment[transportType];
+        let transportIcon = '';
+        switch(transportType) {
+          case 'walk': transportIcon = '🚶'; break;
+          case 'bus': transportIcon = '🚌'; break;
+          case 'tram': transportIcon = '🚊'; break;
+          case 'taxi': transportIcon = '🚕'; break;
+          default: transportIcon = '🛣️';
+        }
+        return `
+          <div class="route-card mb-2">
+            <p><strong>${transportIcon} ${transportType.toUpperCase()} - Segment ${index + 1}</strong></p>
+            <p><strong>Koordinatlar:</strong> ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}</p>
+            <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+          </div>
+        `;
+      }).join('');
+      drawPathOnMap(data, selectedRouteIndex);
+    }
 
     let passengerDisplay = `
       <div class="route-card">
@@ -709,22 +765,35 @@
       ${passengerDisplay}
       ${paymentDisplay}
       <h4 class="mt-2 font-semibold text-center">Rotalar</h4>
-      ${routesHtml}
+      <div class="flex">
+        <div class="w-1/3">
+          ${routesHtml}
+        </div>
+        <div class="w-2/3 pl-4">
+          ${detailedRouteInfo ? `
+            <h4 class="text-lg font-semibold mb-2">Rota ${selectedRouteIndex + 1} Detayları</h4>
+            ${detailedRouteInfo}
+          ` : ''}
+        </div>
+      </div>
     `;
 
     const popup = document.getElementById('routePopup');
-    const overlay = document.getElementById('overlay');
     popup.classList.add('show');
-    overlay.classList.add('show');
+
+    if (selectedRouteIndex === null) {
+      drawPathOnMap(data, 0); // Draw first route by default
+    }
   }
 
   function closePopup() {
     const popup = document.getElementById('routePopup');
-    const overlay = document.getElementById('overlay');
     popup.classList.remove('show');
-    overlay.classList.remove('show');
+    if (currentPolyline) {
+      currentPolyline.setMap(null);
+    }
   }
 </script>
 <script th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${api_key} + '&callback=initMap'}" async defer></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'922dae3edd76bfa9',t:'MTc0MjM5NDc2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

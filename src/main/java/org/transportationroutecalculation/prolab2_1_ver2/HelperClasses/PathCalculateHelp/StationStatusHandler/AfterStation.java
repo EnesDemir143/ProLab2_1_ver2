@@ -9,6 +9,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadServic
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.WalkingControllerService;
 
 import java.awt.geom.Point2D;
+import java.util.AbstractMap;
 
 @Service
 public class AfterStation implements StationHandler {
@@ -28,18 +29,18 @@ public class AfterStation implements StationHandler {
     }
 
     public void last_station_to_end(RequestData frontend_data, Path path){
-        double[] lastPoint = path.path().getLast();
+        double[] lastPoint = path.path().getLast().getValue();
         Point2D.Double point_end = new Point2D.Double(lastPoint[0], lastPoint[1]);
 
         Boolean walk_control_end =(walkingController.can_proceed(point_end, frontend_data.getTargetLocation().getLocation())).getKey();
         double distance_end = (walkingController.can_proceed(point_end, frontend_data.getTargetLocation().getLocation())).getValue();
 
         if (walk_control_end){
-            path.path().addLast(new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()});
+            path.path().addLast(new AbstractMap.SimpleEntry<>("walk", new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()}));
         }
         else{
             double taxi_price = data.getTaxi().calculate_price(distance_end);
-            path.path().addLast(new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()});
+            path.path().addLast(new AbstractMap.SimpleEntry<>("taxi", new double[]{frontend_data.getTargetLocation().getLocation().getX(), frontend_data.getTargetLocation().getLocation().getY()}));
             path.distance().set(path.distance().get() + distance_end);
             path.amount().set(path.amount().get() + taxi_price);
         }
