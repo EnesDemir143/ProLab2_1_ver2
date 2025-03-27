@@ -2,7 +2,8 @@ package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPat
 
 public enum PathType {
     BUS("bus"),
-    TRAM("tram");
+    TRAM("tram"),
+    noType("noType");
     private final String type;
 
     PathType(String type) {

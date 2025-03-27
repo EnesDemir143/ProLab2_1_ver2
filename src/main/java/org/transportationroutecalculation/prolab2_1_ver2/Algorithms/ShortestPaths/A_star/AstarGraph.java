@@ -39,7 +39,7 @@ public class AstarGraph {
         graph_with_nodes.clear();
 
         for (Stations station : graphMap.keySet()) {
-            if(type.equals(station.getStationType())){
+            if(type.equals("notype") || type.equals(station.getStationType())){
                 Node node = new Node(station, station.getLocation().getX(), station.getLocation().getY());
                 node.gcost = Double.POSITIVE_INFINITY;
                 node.hcost = calculateHeuristic(node.x, node.y, endStation.getLocation().getX(), endStation.getLocation().getY());
@@ -50,7 +50,7 @@ public class AstarGraph {
         }
 
         for (Map.Entry<Stations, List<Edge>> entry : graphMap.entrySet()) {
-            if(type.equals(entry.getKey().getStationType())){
+            if(type.equals("notype") || type.equals(entry.getKey().getStationType())){
                 Node node = stationToNode.get(entry.getKey());
                 for (Edge edge : entry.getValue()) {
                     Node neighbor = stationToNode.get(edge.getDestination());

@@ -30,15 +30,17 @@ public class PathCalculate {
     public HashMap<String, List<Route>> path_calculate(@RequestBody RequestData frontend_data, String type){
 
         HashMap<String, List<Route>> backEndReturn;
-
-        Stations startStation = findNearestStation.find_nearest_station(frontend_data.getCurrentLocation()).stream()
-                .filter(x -> x.stations().getStationType().equals(type)).findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No station found with the specified type"))
+Stations startStation = findNearestStation.find_nearest_station(frontend_data.getCurrentLocation()).stream()
+                .filter(x -> "notype".equals(type) || x.stations().getStationType().equals(type))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No suitable station found"))
                 .stations();
         System.out.println("Start station: " + startStation.getStationID());
+
         Stations endStation = findNearestStation.find_nearest_station(frontend_data.getTargetLocation()).stream()
-                .filter(x -> x.stations().getStationType().equals(type)).findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No station found with the specified type"))
+                .filter(x -> "notype".equals(type) || x.stations().getStationType().equals(type))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No suitable station found"))
                 .stations();
         System.out.println("End station: " + endStation.getStationID());
 
