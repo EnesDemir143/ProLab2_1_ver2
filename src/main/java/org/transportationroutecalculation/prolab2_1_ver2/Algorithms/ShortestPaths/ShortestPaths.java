@@ -6,5 +6,5 @@ import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationType
 
 public interface ShortestPaths {
 
-    Path findShortestPaths(Stations startStation, Stations endStation, Metric metric);
+    Path findShortestPaths(Stations startStation, Stations endStation, Metric metric, String type);
 }

@@ -17,7 +17,7 @@ public class PathFactory {
         this.shortestPaths = shortestPaths;
     }
 
-    public Path createPath(Stations startStation, Stations endStation, Metric metric) {
-        return shortestPaths.findShortestPaths(startStation, endStation, metric);
+    public Path createPath(Stations startStation, Stations endStation, Metric metric, String type) {
+        return shortestPaths.findShortestPaths(startStation, endStation, metric, type);
     }
 }

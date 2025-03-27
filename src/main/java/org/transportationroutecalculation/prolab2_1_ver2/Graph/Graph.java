@@ -2,6 +2,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.Graph;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Component
 public class Graph {
 
     private Map<Stations, List<Edge>> graph = new HashMap<>();
@@ -37,27 +38,28 @@ public class Graph {
 
             for (Stations station : data.getStations()) {
                 for (NextStation nextStation : station.getNext_stations()) {
-                    addEdge(station, nextStation.getNextstation(), nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime());
-                    addEdge(nextStation.getNextstation(), station, nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime());
+                    addEdge(station, nextStation.getNextstation(), nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime(), "bus");
+                    addEdge(nextStation.getNextstation(), station, nextStation.getDistance(), nextStation.getAmount(), nextStation.getTime(), "bus");
                 }
                 for (Transfer transfer : station.getTransfer()) {
-                    addEdge(station, transfer.getTransferStation(), transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time());
-                    addEdge(transfer.getTransferStation(), station, transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time());
+                    addEdge(station, transfer.getTransferStation(), transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time(), "transfer");
+                    addEdge(transfer.getTransferStation(), station, transfer.getTransfer_distance(), transfer.getTransfer_amount(), transfer.getTransfer_time(), "transfer");
                 }
             }
 
         printGraph();
     }
 
-    public void addEdge(Stations node, Stations destination, double distance, double amount, int time) {
+    public void addEdge(Stations node, Stations destination, double distance, double amount, int time, String type) {
         System.out.println(node.getStationID());
         graph.putIfAbsent(node, new ArrayList<>());
-        graph.get(node).add(new Edge(destination, distance, amount, time));
+        graph.get(node).add(new Edge(destination, distance, amount, time, type));
     }
 
     public Map<Stations, List<Edge>> getGraph() {
         return graph;
     }
+
 
     private void printGraph() {
         System.out.println("Graphsize : " + graph.keySet().size());

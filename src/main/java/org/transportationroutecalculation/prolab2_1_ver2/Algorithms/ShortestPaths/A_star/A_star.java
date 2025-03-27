@@ -64,9 +64,9 @@ public class A_star implements ShortestPaths {
 
 
     @Override
-    public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric) {
+    public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric, String type) {
 
-        Map<Node, List<Node>> graph_with_nodes = astarGraph.create_graph_with_nodes(endStation);
+        Map<Node, List<Node>> graph_with_nodes = astarGraph.create_graph_with_nodes(endStation, type);
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         HashSet<Node> closedSet = new HashSet<>();
 
@@ -103,6 +103,11 @@ public class A_star implements ShortestPaths {
             }
 
             for (Node neighbor : graph_with_nodes.get(current)){
+
+                if (neighbor == null) {
+                    continue;
+                }
+
                 double tentative_gScore = current.gcost + graphMap.get(current.station).stream().filter(station -> station.getDestination().equals(neighbor.station)).findFirst().map(metric.getMetricFunction()).orElse(0.0);
 
                 if (tentative_gScore < neighbor.gcost){

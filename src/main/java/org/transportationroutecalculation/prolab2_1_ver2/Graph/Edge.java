@@ -8,12 +8,22 @@ public class Edge {
     private double distance;
     private double amount;
     private int time;
+    private String type;
 
-    public Edge(Stations destination, double distance, double amount, int time) {
+    public Edge(Stations destination, double distance, double amount, int time, String type) {
         this.destination = destination;
         this.distance = distance;
         this.amount = amount;
         this.time = time;
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Stations getDestination() {

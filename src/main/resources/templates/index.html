@@ -34,6 +34,8 @@
       width: 28vw;
       float: left;
       padding: 1rem;
+      overflow-y: auto;
+      max-height: 80vh;
     }
     .night-mode .controls-container .bg-white {
       background: #3a3a3a;
@@ -81,16 +83,21 @@
       background: linear-gradient(45deg, #3b82f6, #1d4ed8);
       border-radius: 1.5rem;
       transition: all 0.5s ease;
-      animation: pulse 2s infinite;
     }
 
     .night-mode .btn-draw, .night-mode .toggle-btn, .night-mode .marker-btn {
-      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+      background: transparent;
+      border: 2px solid #8b5cf6;
+      color: #d4d4d8;
     }
 
     .btn-draw:hover, .toggle-btn:hover, .marker-btn:hover {
       transform: translateY(-3px) scale(1.05);
       box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .night-mode .btn-draw:hover, .night-mode .toggle-btn:hover, .night-mode .marker-btn:hover {
+      background: rgba(139, 92, 246, 0.2); /* Hafif transparan efekt */
     }
 
     .navbar {
@@ -194,12 +201,18 @@
     }
 
     .night-mode .popup button {
-      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+      background: transparent;
+      border: 2px solid #8b5cf6;
+      color: #d4d4d8;
     }
 
     .popup button:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .night-mode .popup button:hover {
+      background: rgba(139, 92, 246, 0.2);
     }
 
     .overlay {
@@ -231,10 +244,22 @@
       cursor: pointer;
       transition: all 0.4s ease;
       z-index: 100;
+      font-size: 1.5rem;
     }
 
     .night-mode .mode-toggle {
-      background: linear-gradient(45deg, #6b7280, #8b5cf6);
+      background: transparent;
+      border: 2px solid #8b5cf6;
+      color: #d4d4d8;
+    }
+
+    .mode-toggle:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .night-mode .mode-toggle:hover {
+      background: rgba(139, 92, 246, 0.2);
     }
 
     .dynamic-section {
@@ -255,11 +280,6 @@
       margin-right: 8px;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-      100% { transform: scale(1); }
-    }
     .main-container {
       display: flex;
       flex-direction: column;
@@ -340,25 +360,6 @@
       max-height: 500px;
       overflow-y: auto;
     }
-
-
-    .controls-container {
-      width: 28vw;
-      float: left;
-      padding: 1rem;
-      overflow-y: auto; /* Add scrolling if content overflows */
-      max-height: 80vh; /* Ensure it doesn't overflow the viewport height */
-    }
-
-    #routeInfo {
-      max-height: 300px; /* Limit the height of the route info section */
-      overflow-y: auto; /* Enable scrolling for route info */
-    }
-
-    /* Remove the route-info-container styles since it's no longer used */
-    .route-info-container {
-      display: none; /* Remove this section entirely */
-    }
   </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
@@ -372,7 +373,7 @@
 </nav>
 
 <!-- Mode Toggle -->
-<div class="mode-toggle" onclick="toggleMode()">Gece Modu</div>
+<div class="mode-toggle" onclick="toggleMode()">☀️</div>
 
 <!-- Main Content -->
 <div class="content-wrapper">
@@ -472,10 +473,44 @@
 
 <div id="overlay" class="overlay"></div>
 <script th:inline="javascript">
+  const nightModeStyles = [
+    { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#d4d4d8' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1e25' }] },
+    { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+    { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+    { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
+    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#211f1f' }, { lightness: 10 }] },
+    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#34495e' }] },
+    { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#a0aec0' }] },
+    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#1e2a38' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#211f1f' }] },
+    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212a37' }] },
+    { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#a0aec0' }] },
+    { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#4a627a' }] },
+    { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1f2a44' }] },
+    { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#41556b' }] },
+    { featureType: 'road.local', elementType: 'geometry', stylers: [{ color: '#3c4e66' }] },
+    { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#34495e' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#1a2632' }] },
+    { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#8294a5' }] }
+  ];
+
+  const lightModeStyles = [
+    {"featureType": "water", "elementType": "geometry", "stylers": [{"color": "#87ceeb"}, {"lightness": 10}]},
+    {"featureType": "landscape", "elementType": "geometry", "stylers": [{"color": "#f0fff0"}, {"lightness": 15}]},
+    {"featureType": "road", "elementType": "geometry", "stylers": [{"color": "#ffdead"}, {"lightness": 20}]}
+  ];
+
   function toggleMode() {
     document.body.classList.toggle('night-mode');
     const toggle = document.querySelector('.mode-toggle');
-    toggle.textContent = document.body.classList.contains('night-mode') ? 'Gündüz Modu' : 'Gece Modu';
+    const isNightMode = document.body.classList.contains('night-mode');
+    toggle.textContent = isNightMode ? '🌙' : '☀️';
+    localStorage.setItem('mode', isNightMode ? 'night' : 'day');
+    if (map) {
+      map.setOptions({ styles: isNightMode ? nightModeStyles : lightModeStyles });
+    }
   }
 
   function toggleSection(sectionId) {
@@ -489,18 +524,24 @@
   var infoWindow;
   var startMarker = null;
   var targetMarker = null;
-  var allRoutesData = null; // Store all routes data globally
-  var requestDataGlobal = null; // Store request data globally
+  var allRoutesData = null;
+  var requestDataGlobal = null;
 
   function initMap() {
+    const savedMode = localStorage.getItem('mode');
+    if (savedMode === 'night') {
+      document.body.classList.add('night-mode');
+      document.querySelector('.mode-toggle').textContent = '🌙';
+    } else {
+      document.body.classList.remove('night-mode');
+      document.querySelector('.mode-toggle').textContent = '☀️';
+    }
+
+    const isNightMode = document.body.classList.contains('night-mode');
     map = new google.maps.Map(document.getElementById('map'), {
       zoom: 12,
       center: {lat: 40.7669, lng: 29.9408},
-      styles: [
-        {"featureType": "water", "elementType": "geometry", "stylers": [{"color": "#87ceeb"}, {"lightness": 10}]},
-        {"featureType": "landscape", "elementType": "geometry", "stylers": [{"color": "#f0fff0"}, {"lightness": 15}]},
-        {"featureType": "road", "elementType": "geometry", "stylers": [{"color": "#ffdead"}, {"lightness": 20}]}
-      ]
+      styles: isNightMode ? nightModeStyles : lightModeStyles
     });
 
     infoWindow = new google.maps.InfoWindow();
@@ -614,7 +655,6 @@
   }
 
   function showErrorPopup(message) {
-    // Create the popup if it doesn't exist
     let popup = document.querySelector('.popup');
     if (!popup) {
       popup = document.createElement('div');
@@ -622,7 +662,6 @@
       document.body.appendChild(popup);
     }
 
-    // Create the overlay if it doesn't exist
     let overlay = document.querySelector('.overlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -630,14 +669,12 @@
       document.body.appendChild(overlay);
     }
 
-    // Populate the popup content
     popup.innerHTML = `
-    <h3>Rota Bulunamadı</h3>
-    <p>${message}</p>
-    <button onclick="closeErrorPopup()">Tamam</button>
-  `;
+      <h3>Rota Bulunamadı</h3>
+      <p>${message}</p>
+      <button onclick="closeErrorPopup()">Tamam</button>
+    `;
 
-    // Show the popup and overlay
     popup.classList.add('show');
     overlay.classList.add('show');
   }
@@ -716,17 +753,15 @@
     })
             .then(response => response.json())
             .then(data => {
-              // Check if routes exist
               if (!data.routes || data.routes.length === 0) {
                 throw new Error('Belirtilen koordinatlar arasında sizin bakiyenize uygun rota bulunamadı.');
               }
 
-              allRoutesData = data; // Store data globally
-              requestDataGlobal = requestData; // Store request data globally
-              showRouteInfo(data, requestData); // Show all routes initially
+              allRoutesData = data;
+              requestDataGlobal = requestData;
+              showRouteInfo(data, requestData);
             })
             .catch(error => {
-              // Clear any existing routes
               if (currentPolyline) {
                 if (Array.isArray(currentPolyline)) {
                   currentPolyline.forEach(poly => poly.setMap(null));
@@ -735,10 +770,7 @@
                 }
               }
 
-              // Clear route info
               document.getElementById('routeInfo').innerHTML = '';
-
-              // Show error popup
               showErrorPopup(error.message || 'Rota çizilirken bir hata oluştu.');
             });
   }
@@ -748,18 +780,17 @@
     const uniqueTypes = [...new Set(transportTypes)];
 
     if (uniqueTypes.length === 1 && uniqueTypes[0] === 'taxi') {
-      return '#F59E0B'; // Yellow for taxi-only
+      return '#F59E0B';
     } else if (transportTypes.includes('walk')) {
-      return '#3B82F6'; // Blue for routes with walk
+      return '#3B82F6';
     } else if (uniqueTypes.length === 1 && (uniqueTypes[0] === 'bus' || uniqueTypes[0] === 'tram')) {
-      return '#10B981'; // Green for same transport (bus or tram)
+      return '#10B981';
     } else {
-      return '#8B5CF6'; // Purple for mixed transport
+      return '#8B5CF6';
     }
   }
 
   function drawPathOnMap(data, routeIndex) {
-    // Clear any existing polylines
     if (currentPolyline) {
       if (Array.isArray(currentPolyline)) {
         currentPolyline.forEach(poly => poly.setMap(null));
@@ -776,9 +807,8 @@
     });
 
     const strokeColor = determineRouteColor(route);
-    currentPolyline = []; // Array to store all segment polylines
+    currentPolyline = [];
 
-    // Create a polyline for each segment
     for (let i = 0; i < pathCoordinates.length - 1; i++) {
       const segmentPath = [
         pathCoordinates[i],
@@ -796,25 +826,22 @@
 
       currentPolyline.push(segmentPolyline);
 
-      // Determine transport type for this segment
       const transportType = Object.keys(route.path[i])[0];
       const startCoords = route.path[i][transportType];
       const endCoords = route.path[i + 1] ? route.path[i + 1][Object.keys(route.path[i + 1])[0]] : startCoords;
 
-      // Create InfoWindow for this segment
       const infoWindow = new google.maps.InfoWindow({
         content: `
-        <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
-          <p><strong>Rota ${routeIndex + 1}</strong></p>
-          <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Segment ${i + 1}</h4>
-          <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
-          <p><strong>Başlangıç:</strong> ${startCoords[0].toFixed(6)}, ${startCoords[1].toFixed(6)}</p>
-          <p><strong>Bitiş:</strong> ${endCoords[0].toFixed(6)}, ${endCoords[1].toFixed(6)}</p>
-        </div>
-      `
+          <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
+            <p><strong>Rota ${routeIndex + 1}</strong></p>
+            <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Segment ${i + 1}</h4>
+            <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+            <p><strong>Başlangıç:</strong> ${startCoords[0].toFixed(6)}, ${startCoords[1].toFixed(6)}</p>
+            <p><strong>Bitiş:</strong> ${endCoords[0].toFixed(6)}, ${endCoords[1].toFixed(6)}</p>
+          </div>
+        `
       });
 
-      // Add hover events
       google.maps.event.addListener(segmentPolyline, 'mouseover', function(event) {
         infoWindow.setPosition(event.latLng);
         infoWindow.open(map);
@@ -825,7 +852,6 @@
       });
     }
 
-    // Adjust map bounds to fit the entire route
     const bounds = new google.maps.LatLngBounds();
     pathCoordinates.forEach(coord => {
       bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
@@ -839,7 +865,6 @@
     const paymentType = requestData.payment_method.type;
     const paymentMethod = requestData.payment_method;
 
-    // Function to get transport icon
     function getTransportIcon(route) {
       const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
       const uniqueTypes = [...new Set(transportTypes)];
@@ -858,7 +883,6 @@
     let detailedRouteInfo = '';
 
     if (selectedRouteIndex === null) {
-      // Show all routes initially
       routesHtml = data.routes.map((route, index) => `
         <div class="route-card route-selector" onclick="showRouteInfo(allRoutesData, requestDataGlobal, ${index})" data-route-index="${index}">
           <p><strong>Rota ${index + 1} ${getTransportIcon(route)}</strong></p>
@@ -869,7 +893,6 @@
         </div>
       `).join('');
     } else {
-      // Show selected route with details
       const route = data.routes[selectedRouteIndex];
       routesHtml = data.routes.map((route, index) => `
         <div class="route-card route-selector ${index === selectedRouteIndex ? 'bg-blue-100 dark:bg-gray-700' : ''}"
@@ -959,15 +982,12 @@
       </div>
     `;
 
-    // Scroll to route info section
     document.getElementById('routeInfo').scrollIntoView({ behavior: 'smooth' });
 
     if (selectedRouteIndex === null) {
-      drawPathOnMap(data, 0); // Draw first route by default
+      drawPathOnMap(data, 0);
     }
   }
-
-
 </script>
 <script th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${api_key} + '&callback=initMap'}" async defer></script>
 </body>

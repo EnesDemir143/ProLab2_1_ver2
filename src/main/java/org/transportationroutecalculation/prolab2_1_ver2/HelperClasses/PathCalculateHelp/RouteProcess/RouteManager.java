@@ -7,6 +7,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.StationStatusHandler.AfterStation;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.StationStatusHandler.BeforeStation;
@@ -32,13 +33,13 @@ public class RouteManager {
         this.alternativePath = alternativePath;
     }
 
-    public HashMap<String, List<Route>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation) {
+    public HashMap<String, List<Route>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
         HashMap<String, List<Route>> backEndReturn = new HashMap<>();
         List<Path> paths = new ArrayList<>();
         List<Route> routes = new ArrayList<>();
 
         for (Metric metric : Metric.values()) {
-            paths.add(pathFactory.createPath(startStation, endStation, metric));
+            paths.add(pathFactory.createPath(startStation, endStation, metric, type));
         }
 
         for (Path path : paths) {
@@ -52,11 +53,13 @@ public class RouteManager {
             routes.add(RouteBuilder.buildFromPath(path));
         }
 
-        Path alternative_path = alternativePath.calculatePath(frontend_data);
-        routes.add(RouteBuilder.buildFromPath(alternative_path));
-
         backEndReturn.put("routes", routes);
 
         return backEndReturn;
     }
+
+    public Path AlternativePath(RequestData frontend_data, HashMap<String, List<Route>> routes) {
+        return alternativePath.calculatePath(frontend_data);
+    }
+
 }

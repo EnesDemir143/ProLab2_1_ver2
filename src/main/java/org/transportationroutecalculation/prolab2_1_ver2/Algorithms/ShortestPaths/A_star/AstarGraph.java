@@ -33,25 +33,29 @@ public class AstarGraph {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    public Map<Node, List<Node>> create_graph_with_nodes(Stations endStation) {
+    public Map<Node, List<Node>> create_graph_with_nodes(Stations endStation, String type) {
 
         Map<Stations, Node> stationToNode = new HashMap<>();
         graph_with_nodes.clear();
 
         for (Stations station : graphMap.keySet()) {
-            Node node = new Node(station, station.getLocation().getX(), station.getLocation().getY());
-            node.gcost = Double.POSITIVE_INFINITY;
-            node.hcost = calculateHeuristic(node.x, node.y, endStation.getLocation().getX(), endStation.getLocation().getY());
-            node.fcost = Double.POSITIVE_INFINITY;
-            stationToNode.put(station, node);
-            graph_with_nodes.put(node, new ArrayList<>());
+            if(type.equals(station.getStationType())){
+                Node node = new Node(station, station.getLocation().getX(), station.getLocation().getY());
+                node.gcost = Double.POSITIVE_INFINITY;
+                node.hcost = calculateHeuristic(node.x, node.y, endStation.getLocation().getX(), endStation.getLocation().getY());
+                node.fcost = Double.POSITIVE_INFINITY;
+                stationToNode.put(station, node);
+                graph_with_nodes.put(node, new ArrayList<>());
+            }
         }
 
         for (Map.Entry<Stations, List<Edge>> entry : graphMap.entrySet()) {
-            Node node = stationToNode.get(entry.getKey());
-            for (Edge edge : entry.getValue()) {
-                Node neighbor = stationToNode.get(edge.getDestination());
-                graph_with_nodes.get(node).add(neighbor);
+            if(type.equals(entry.getKey().getStationType())){
+                Node node = stationToNode.get(entry.getKey());
+                for (Edge edge : entry.getValue()) {
+                    Node neighbor = stationToNode.get(edge.getDestination());
+                    graph_with_nodes.get(node).add(neighbor);
+                }
             }
         }
 
