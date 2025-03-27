@@ -341,12 +341,6 @@
       overflow-y: auto;
     }
 
-    /* Remove popup styles */
-    .popup, .overlay {
-      display: none;
-    }
-
-
 
     .controls-container {
       width: 28vw;
@@ -619,6 +613,43 @@
     }
   }
 
+  function showErrorPopup(message) {
+    // Create the popup if it doesn't exist
+    let popup = document.querySelector('.popup');
+    if (!popup) {
+      popup = document.createElement('div');
+      popup.classList.add('popup');
+      document.body.appendChild(popup);
+    }
+
+    // Create the overlay if it doesn't exist
+    let overlay = document.querySelector('.overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.classList.add('overlay');
+      document.body.appendChild(overlay);
+    }
+
+    // Populate the popup content
+    popup.innerHTML = `
+    <h3>Rota Bulunamadı</h3>
+    <p>${message}</p>
+    <button onclick="closeErrorPopup()">Tamam</button>
+  `;
+
+    // Show the popup and overlay
+    popup.classList.add('show');
+    overlay.classList.add('show');
+  }
+
+  function closeErrorPopup() {
+    const popup = document.querySelector('.popup');
+    const overlay = document.querySelector('.overlay');
+
+    if (popup) popup.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+  }
+
   function drawRoute() {
     const start_lat = parseFloat(document.getElementById('start_lat').value);
     const start_lon = parseFloat(document.getElementById('start_lon').value);
@@ -683,19 +714,32 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestData)
     })
-            .then(response => {
-              if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.detail || 'Bilinmeyen bir hata oluştu'); });
-              }
-              return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
+              // Check if routes exist
+              if (!data.routes || data.routes.length === 0) {
+                throw new Error('Belirtilen koordinatlar arasında sizin bakiyenize uygun rota bulunamadı.');
+              }
+
               allRoutesData = data; // Store data globally
               requestDataGlobal = requestData; // Store request data globally
               showRouteInfo(data, requestData); // Show all routes initially
             })
             .catch(error => {
-              alert('Rota çizilirken bir hata oluştu: ' + error.message);
+              // Clear any existing routes
+              if (currentPolyline) {
+                if (Array.isArray(currentPolyline)) {
+                  currentPolyline.forEach(poly => poly.setMap(null));
+                } else {
+                  currentPolyline.setMap(null);
+                }
+              }
+
+              // Clear route info
+              document.getElementById('routeInfo').innerHTML = '';
+
+              // Show error popup
+              showErrorPopup(error.message || 'Rota çizilirken bir hata oluştu.');
             });
   }
 
@@ -715,8 +759,13 @@
   }
 
   function drawPathOnMap(data, routeIndex) {
+    // Clear any existing polylines
     if (currentPolyline) {
-      currentPolyline.setMap(null);
+      if (Array.isArray(currentPolyline)) {
+        currentPolyline.forEach(poly => poly.setMap(null));
+      } else {
+        currentPolyline.setMap(null);
+      }
     }
 
     const route = data.routes[routeIndex];
@@ -727,38 +776,56 @@
     });
 
     const strokeColor = determineRouteColor(route);
+    currentPolyline = []; // Array to store all segment polylines
 
-    currentPolyline = new google.maps.Polyline({
-      path: pathCoordinates,
-      geodesic: true,
-      strokeColor: strokeColor,
-      strokeOpacity: 1.0,
-      strokeWeight: 4
-    });
+    // Create a polyline for each segment
+    for (let i = 0; i < pathCoordinates.length - 1; i++) {
+      const segmentPath = [
+        pathCoordinates[i],
+        pathCoordinates[i + 1]
+      ];
 
-    currentPolyline.setMap(map);
+      const segmentPolyline = new google.maps.Polyline({
+        path: segmentPath,
+        geodesic: true,
+        strokeColor: strokeColor,
+        strokeOpacity: 1.0,
+        strokeWeight: 4,
+        map: map
+      });
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
+      currentPolyline.push(segmentPolyline);
+
+      // Determine transport type for this segment
+      const transportType = Object.keys(route.path[i])[0];
+      const startCoords = route.path[i][transportType];
+      const endCoords = route.path[i + 1] ? route.path[i + 1][Object.keys(route.path[i + 1])[0]] : startCoords;
+
+      // Create InfoWindow for this segment
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
         <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
-          <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Rota ${routeIndex + 1}</h4>
-          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-          <p><strong>Süre:</strong> ${route.time} dk</p>
-          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-          <p><strong>En İyi:</strong> ${route.bestFor}</p>
+          <p><strong>Rota ${routeIndex + 1}</strong></p>
+          <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Segment ${i + 1}</h4>
+          <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+          <p><strong>Başlangıç:</strong> ${startCoords[0].toFixed(6)}, ${startCoords[1].toFixed(6)}</p>
+          <p><strong>Bitiş:</strong> ${endCoords[0].toFixed(6)}, ${endCoords[1].toFixed(6)}</p>
         </div>
-      `,
-    });
+      `
+      });
 
-    google.maps.event.addListener(currentPolyline, 'mouseover', function(event) {
-      infoWindow.setPosition(event.latLng);
-      infoWindow.open(map);
-    });
+      // Add hover events
+      google.maps.event.addListener(segmentPolyline, 'mouseover', function(event) {
+        infoWindow.setPosition(event.latLng);
+        infoWindow.open(map);
+      });
 
-    google.maps.event.addListener(currentPolyline, 'mouseout', function() {
-      infoWindow.close();
-    });
+      google.maps.event.addListener(segmentPolyline, 'mouseout', function() {
+        infoWindow.close();
+      });
+    }
 
+    // Adjust map bounds to fit the entire route
     const bounds = new google.maps.LatLngBounds();
     pathCoordinates.forEach(coord => {
       bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
