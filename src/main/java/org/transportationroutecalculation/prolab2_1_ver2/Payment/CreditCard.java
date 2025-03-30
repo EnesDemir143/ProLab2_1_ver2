@@ -18,6 +18,11 @@ public class CreditCard extends PaymentMethods implements PaymentCalculate{
         super();
     }
 
+    @Override
+    public double getMoney() {
+        return getLimit();
+    }
+
     public CreditCard(int limit, String number) {
         this.limit = limit;
         this.number = number;

@@ -17,6 +17,11 @@ public class CityCard extends PaymentMethods implements PaymentCalculate{
         super();
     }
 
+    @Override
+    public double getMoney() {
+       return getBalance();
+    }
+
     public CityCard(double balance, double card_number) {
         this.balance = balance;
         this.card_number = card_number;

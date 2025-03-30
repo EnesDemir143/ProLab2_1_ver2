@@ -17,4 +17,6 @@ public abstract class PaymentMethods implements PaymentCalculate{
     public PaymentMethods() {
     }
 
+    public abstract double getMoney();
+
 }

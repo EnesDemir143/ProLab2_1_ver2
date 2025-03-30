@@ -15,6 +15,11 @@ public class Cash extends PaymentMethods implements PaymentCalculate{
         super();
     }
 
+    @Override
+    public double getMoney() {
+        return getCash();
+    }
+
     public Cash(double cash) {
         this.cash = cash;
     }
