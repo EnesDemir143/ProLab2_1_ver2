@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPat
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 public class Node implements Comparable<Node> {
-    public Stations station;
+    Stations station;
     double x, y;
     double gcost, hcost, fcost;
     Node parent;

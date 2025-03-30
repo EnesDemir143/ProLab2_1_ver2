@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPat
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Metrics;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.ShortestPaths;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Edge;
 import org.transportationroutecalculation.prolab2_1_ver2.Graph.Graph;
@@ -64,7 +64,7 @@ public class A_star implements ShortestPaths {
 
 
     @Override
-    public Path findShortestPaths(Stations startStation, Stations endStation, Metric metric, String type) {
+    public Path2 findShortestPaths(Stations startStation, Stations endStation, Metric metric, String type) {
 
         Map<Node, List<Node>> graph_with_nodes = astarGraph.create_graph_with_nodes(endStation, type);
         PriorityQueue<Node> openSet = new PriorityQueue<>();
@@ -92,7 +92,7 @@ public class A_star implements ShortestPaths {
                         .forEach(node ->
                                 paths.add(Map.entry(node.station.getStationType(), new double[]{node.x, node.y}))
                         );
-                return new Path(paths,new AtomicReference<>(calculatedMetrics.distance()),new AtomicReference<>(calculatedMetrics.time()),new AtomicReference<>(calculatedMetrics.amount()), (String) metric.getMetricName());
+                return new Path2(paths, calculatedMetrics.distance(), calculatedMetrics.time(), calculatedMetrics.amount(), (String) metric.getMetricName());
             }
 
             openSet.remove(current);

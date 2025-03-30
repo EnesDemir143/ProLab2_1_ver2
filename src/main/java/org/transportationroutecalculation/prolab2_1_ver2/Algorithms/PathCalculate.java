@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.FindNearestStation;
-import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteBuilder;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteConcat;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
@@ -27,9 +25,9 @@ public class PathCalculate {
     }
 
 
-    public HashMap<String, List<Route>> path_calculate(@RequestBody RequestData frontend_data, String type){
+    public HashMap<String, List<Route2>> path_calculate(@RequestBody RequestData frontend_data, String type){
 
-        HashMap<String, List<Route>> backEndReturn;
+        HashMap<String, List<Route2>> backEndReturn;
 Stations startStation = findNearestStation.find_nearest_station(frontend_data.getCurrentLocation()).stream()
                 .filter(x -> "notype".equals(type) || x.stations().getStationType().equals(type))
                 .findFirst()

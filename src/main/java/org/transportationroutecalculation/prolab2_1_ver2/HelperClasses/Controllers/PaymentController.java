@@ -1,6 +1,6 @@
 package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers;
 
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
 import org.transportationroutecalculation.prolab2_1_ver2.Payment.PaymentMethods;
 
@@ -17,24 +17,24 @@ public class PaymentController extends Controllers{
         this.passenger = passenger;
     }
 
-    public HashMap<String, List<Route>> PayControl(HashMap<String, List<Route>> routes) {
-        List<Route> routeList = routes.get("routes");
+    public HashMap<String, List<Route2>> PayControl(HashMap<String, List<Route2>> routes) {
+        List<Route2> routeList = routes.get("routes");
         if (routeList == null) {
             return routes;
         }
 
-        List<Route> mutableRouteList = new ArrayList<>(routeList);
-        List<Route> routesToRemove = new ArrayList<>();
+        List<Route2> mutableRouteList = new ArrayList<>(routeList);
+        List<Route2> routesToRemove = new ArrayList<>();
 
         double money = passenger.getPaymentMethod().map(PaymentMethods::getMoney).orElse(0.0);
 
-        for (Route route : mutableRouteList) {
+        for (Route2 route : mutableRouteList) {
             if (money < 0) {
                 return routes;
-            } else if (money < passenger.getDiscountRate()*(route.amount().get())) {
+            } else if (money < passenger.getDiscountRate()*(route.getAmount())) {
                 routesToRemove.add(route);
             } else {
-                route.amount().set(passenger.getDiscountRate()*(route.amount().get()));
+                route.setAmount(passenger.getDiscountRate()*(route.getAmount()));
                 System.out.println("Ödeme başarılı");
             }
         }

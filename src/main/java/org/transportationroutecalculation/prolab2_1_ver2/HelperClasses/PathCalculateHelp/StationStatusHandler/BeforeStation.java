@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.WalkingControllerService;
@@ -24,26 +24,26 @@ public class BeforeStation implements StationHandler {
     }
 
     @Override
-    public void processStation(RequestData requestData, Path path) {
+    public void processStation(RequestData requestData, Path2 path) {
         start_to_end(requestData, path);
     }
 
-    public void start_to_end(RequestData frontend_data, Path path){
-        double[] startPoint = path.path().getFirst().getValue();
+    public void start_to_end(RequestData frontend_data, Path2 path){
+        double[] startPoint = path.getPath().getFirst().getValue();
         Point2D.Double point_start = new Point2D.Double(startPoint[0], startPoint[1]);
 
         Boolean walk_control_start = (walkingController.can_proceed(frontend_data.getCurrentLocation().getLocation(), point_start)).getKey();
         double distance_start = (walkingController.can_proceed(frontend_data.getCurrentLocation().getLocation(), point_start)).getValue();
 
         if (walk_control_start){
-            path.path().addFirst(new AbstractMap.SimpleEntry<>("walk", new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()}));
+            path.getPath().addFirst(new AbstractMap.SimpleEntry<>("walk", new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()}));
         }
         else{
             double taxi_price = data.getTaxi().calculate_price(distance_start);
 
-            path.path().addFirst(new AbstractMap.SimpleEntry<>("taxi", new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()}));
-            path.distance().set(path.distance().get() + distance_start);
-            path.amount().set(path.amount().get() + taxi_price);
+            path.getPath().addFirst(new AbstractMap.SimpleEntry<>("taxi", new double[]{frontend_data.getCurrentLocation().getLocation().getX(), frontend_data.getCurrentLocation().getLocation().getY()}));
+            path.setDistance(path.getDistance() + distance_start);
+            path.setAmount(path.getAmount() + taxi_price);
         }
     }
 }

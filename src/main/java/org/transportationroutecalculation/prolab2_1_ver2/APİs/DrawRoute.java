@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.PathCalculate;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteBuilder;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteConcat;
@@ -25,11 +25,11 @@ public class DrawRoute {
     @Autowired
     public DrawRoute(RouteConcat routeConcat, PathCalculate pathCalculate) {
         this.routeConcat = routeConcat;
-        this.pathCalculate = pathCalculate; // İsim standardizasyonu için değiştirildi
+        this.pathCalculate = pathCalculate;
     }
 
-    public HashMap<String, List<Route>> drawRoute(@RequestBody RequestData data) {
-        HashMap<String, List<Route>> routeResult = new HashMap<>();
+    public HashMap<String, List<Route2>> drawRoute(@RequestBody RequestData data) {
+        HashMap<String, List<Route2>> routeResult = new HashMap<>();
 
         calculateStandardRoutes(data, routeResult);
 
@@ -38,25 +38,25 @@ public class DrawRoute {
         return routeResult;
     }
 
-    private void calculateStandardRoutes(RequestData data, HashMap<String, List<Route>> routeResult) {
+    private void calculateStandardRoutes(RequestData data, HashMap<String, List<Route2>> routeResult) {
         for (PathType pathType : PathType.values()) {
             String pathTypeName = pathType.name().toLowerCase(Locale.ROOT);
-            HashMap<String, List<Route>> calculatedRoutes = pathCalculate.path_calculate(data, pathTypeName);
+            HashMap<String, List<Route2>> calculatedRoutes = pathCalculate.path_calculate(data, pathTypeName);
 
-            for (Map.Entry<String, List<Route>> entry : calculatedRoutes.entrySet()) {
+            for (Map.Entry<String, List<Route2>> entry : calculatedRoutes.entrySet()) {
                 routeResult.putIfAbsent(pathTypeName, new ArrayList<>());
 
-                List<Route> currentList = routeResult.get(pathTypeName);
+                List<Route2> currentList = routeResult.get(pathTypeName);
 
                 currentList.addAll(entry.getValue());
             }
         }
     }
 
-    private void addAlternativeRoute(RequestData data, HashMap<String, List<Route>> routeResult) {
+    private void addAlternativeRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
         routeResult.putIfAbsent(ALTERNATIVE_ROUTE_KEY, new ArrayList<>());
 
-        Route alternativeRoute = RouteBuilder.buildFromPath(routeConcat.calculateAlternativePath(data));
+        Route2 alternativeRoute = RouteBuilder.buildFromPath(routeConcat.calculateAlternativePath(data));
         routeResult.get(ALTERNATIVE_ROUTE_KEY).add(alternativeRoute);
     }
 }

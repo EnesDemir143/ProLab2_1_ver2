@@ -1,12 +1,11 @@
-// RouteManager.java
 package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.StationStatusHandler.AfterStation;
@@ -33,16 +32,16 @@ public class RouteManager {
         this.alternativePath = alternativePath;
     }
 
-    public HashMap<String, List<Route>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
-        HashMap<String, List<Route>> backEndReturn = new HashMap<>();
-        List<Path> paths = new ArrayList<>();
-        List<Route> routes = new ArrayList<>();
+    public HashMap<String, List<Route2>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
+        HashMap<String, List<Route2>> backEndReturn = new HashMap<>();
+        List<Path2> paths = new ArrayList<>();
+        List<Route2> routes = new ArrayList<>();
 
         for (Metric metric : Metric.values()) {
             paths.add(pathFactory.createPath(startStation, endStation, metric, type));
         }
 
-        for (Path path : paths) {
+        for (Path2 path : paths) {
             if (path == null) {
                 System.err.println("RouteManager: Path not found!");
                 return null;
@@ -58,7 +57,7 @@ public class RouteManager {
         return backEndReturn;
     }
 
-    public Path AlternativePath(RequestData frontend_data, HashMap<String, List<Route>> routes) {
+    public Path2 AlternativePath(RequestData frontend_data, HashMap<String, List<Route2>> routes) {
         return alternativePath.calculatePath(frontend_data);
     }
 
