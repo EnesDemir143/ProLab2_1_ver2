@@ -1,7 +1,6 @@
 package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.CurrentLocation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.TargetLocation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;

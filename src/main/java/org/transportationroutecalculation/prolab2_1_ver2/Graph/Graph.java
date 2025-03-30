@@ -3,7 +3,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.Graph;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
@@ -19,14 +18,13 @@ import java.util.Map;
 public class Graph {
 
     private Map<Stations, List<Edge>> graph = new HashMap<>();
-    private final JsonLoadService jsonLoadService;
     private final Data data;
 
     @Autowired
-    public Graph(JsonLoadService jsonLoadService) {
-        this.jsonLoadService = jsonLoadService;
+    public Graph(JsonLoadService jsonLoadService ) {
         this.data = jsonLoadService.getData();
         System.out.println("Graph: Stations boyutu: " + (data.getStations() != null ? data.getStations().length : "null"));
+        createGraph();
     }
 
     @PostConstruct
