@@ -97,7 +97,7 @@
     }
 
     .night-mode .btn-draw:hover, .night-mode .toggle-btn:hover, .night-mode .marker-btn:hover {
-      background: rgba(139, 92, 246, 0.2); /* Hafif transparan efekt */
+      background: rgba(139, 92, 246, 0.2);
     }
 
     .navbar {
@@ -221,7 +221,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0);
+      background: rgba(0, 0, 0, 0.4);
       z-index: 100;
       opacity: 0;
       transition: opacity 0.4s ease;
@@ -230,7 +230,7 @@
 
     .overlay.show {
       opacity: 1;
-      pointer-events: none;
+      pointer-events: auto;
     }
 
     .mode-toggle {
@@ -335,10 +335,10 @@
     .popup {
       position: fixed;
       top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 600px;
+      right: 2rem;
+      transform: translateY(-50%);
+      width: 25vw;
+      max-width: 400px;
     }
 
     @media (max-width: 1024px) {
@@ -354,11 +354,96 @@
       #map-container {
         height: 60vh;
       }
+
+      .popup {
+        width: 80%;
+        right: 50%;
+        transform: translate(50%, -50%);
+      }
     }
 
     #routeInfo {
       max-height: 500px;
       overflow-y: auto;
+    }
+
+    .transport-type {
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      background: rgba(59, 130, 246, 0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .night-mode .transport-type {
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .transport-type:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    .night-mode .transport-type:hover {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    .route-list {
+      display: none;
+      margin-left: 1rem;
+    }
+
+    .route-list.show {
+      display: block;
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%) scale(0.9);
+      background: linear-gradient(135deg, rgba(219, 234, 254, 0.95), rgba(191, 219, 254, 0.9));
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      max-width: 400px;
+      width: 25vw;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s ease;
+      border: 2px solid #3b82f6;
+      backdrop-filter: blur(10px);
+      color: #1e40af;
+    }
+
+    .popup.show {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .night-mode .popup {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(55, 65, 81, 0.9));
+      border: 2px solid #8b5cf6;
+      color: #d4d4d8;
+    }
+
+    /* Updated overlay to be transparent and allow interaction */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent; /* No darkening effect */
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none; /* Allows interaction with background */
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: none; /* Still allows background interaction */
     }
   </style>
 </head>
@@ -458,7 +543,7 @@
 
         <button onclick="drawRoute()" class="btn-draw w-full text-white p-3 font-semibold text-base mt-4">Yolu Çiz</button>
 
-        <!-- Route Info (Moved Here) -->
+        <!-- Route Info -->
         <div id="routeInfo" class="space-y-4 mt-4"></div>
       </div>
     </div>
@@ -520,12 +605,13 @@
 
   var stops = /*[[${stops}]]*/ [];
   var map;
-  var currentPolyline = null;
+  var currentPolyline = [];
   var infoWindow;
   var startMarker = null;
   var targetMarker = null;
   var allRoutesData = null;
   var requestDataGlobal = null;
+  var routeDataStore = []; // Rotaları saklamak için global bir dizi
 
   function initMap() {
     const savedMode = localStorage.getItem('mode');
@@ -672,14 +758,90 @@
     popup.innerHTML = `
       <h3>Rota Bulunamadı</h3>
       <p>${message}</p>
-      <button onclick="closeErrorPopup()">Tamam</button>
+      <button onclick="closePopup()">Tamam</button>
     `;
 
     popup.classList.add('show');
     overlay.classList.add('show');
   }
 
-  function closeErrorPopup() {
+  function showRouteDetailsPopup(routeIndex, type) {
+    const route = routeDataStore[routeIndex];
+    if (!route) {
+      showErrorPopup('Rota verisi bulunamadı.');
+      return;
+    }
+
+    let popup = document.querySelector('.popup');
+    if (!popup) {
+      popup = document.createElement('div');
+      popup.classList.add('popup');
+      document.body.appendChild(popup);
+    }
+
+    let overlay = document.querySelector('.overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.classList.add('overlay');
+      document.body.appendChild(overlay);
+    }
+
+    // Transport icon helper function
+    function getTransportIcon(route) {
+      const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
+      const uniqueTypes = [...new Set(transportTypes)];
+      return uniqueTypes.map(type => {
+        switch(type) {
+          case 'walk': return '🚶';
+          case 'bus': return '🚌';
+          case 'tram': return '🚊';
+          case 'taxi': return '🚕';
+          default: return '🛣️';
+        }
+      }).join(' ');
+    }
+
+    // Detailed segment info
+    const detailedRouteInfo = route.path.map((segment, index) => {
+      const transportType = Object.keys(segment)[0];
+      const coords = segment[transportType];
+      let transportIcon = '';
+      switch(transportType) {
+        case 'walk': transportIcon = '🚶'; break;
+        case 'bus': transportIcon = '🚌'; break;
+        case 'tram': transportIcon = '🚊'; break;
+        case 'taxi': transportIcon = '🚕'; break;
+        default: transportIcon = '🛣️';
+      }
+      return `
+      <div class="route-card mb-2">
+        <p><strong>${transportIcon} ${transportType.toUpperCase()} - Segment ${index + 1}</strong></p>
+        <p><strong>Koordinatlar:</strong> ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}</p>
+        <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+      </div>
+    `;
+    }).join('');
+
+    popup.innerHTML = `
+    <h3 class="text-lg font-semibold mb-2">${type.toUpperCase()} - Rota ${routeIndex + 1} ${getTransportIcon(route)}</h3>
+    <div class="space-y-2">
+      <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+      <p><strong>Süre:</strong> ${route.time} dk</p>
+      <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+      <p><strong>En İyi:</strong> ${route.bestFor}</p>
+    </div>
+    <h4 class="text-md font-semibold mt-4 mb-2">Rota Detayları</h4>
+    <div class="max-h-60 overflow-y-auto">
+      ${detailedRouteInfo}
+    </div>
+    <button onclick="closePopup()" class="btn-draw w-full text-white p-3 font-semibold text-base mt-4">Kapat</button>
+  `;
+
+    popup.classList.add('show');
+    overlay.classList.add('show');
+  }
+
+  function closePopup() {
     const popup = document.querySelector('.popup');
     const overlay = document.querySelector('.overlay');
 
@@ -751,31 +913,32 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestData)
     })
-            .then(response => response.json())
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('API yanıtı başarısız: ' + response.statusText);
+              }
+              return response.json();
+            })
             .then(data => {
-              if (!data.routes || data.routes.length === 0) {
+              if (!data || Object.keys(data).length === 0) {
                 throw new Error('Belirtilen koordinatlar arasında sizin bakiyenize uygun rota bulunamadı.');
               }
-
               allRoutesData = data;
               requestDataGlobal = requestData;
               showRouteInfo(data, requestData);
             })
             .catch(error => {
-              if (currentPolyline) {
-                if (Array.isArray(currentPolyline)) {
-                  currentPolyline.forEach(poly => poly.setMap(null));
-                } else {
-                  currentPolyline.setMap(null);
-                }
+              if (currentPolyline.length > 0) {
+                currentPolyline.forEach(poly => poly.setMap(null));
+                currentPolyline = [];
               }
-
               document.getElementById('routeInfo').innerHTML = '';
               showErrorPopup(error.message || 'Rota çizilirken bir hata oluştu.');
             });
   }
 
   function determineRouteColor(route) {
+    if (!route || !route.path) return '#8B5CF6'; // Varsayılan renk
     const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
     const uniqueTypes = [...new Set(transportTypes)];
 
@@ -790,24 +953,49 @@
     }
   }
 
-  function drawPathOnMap(data, routeIndex) {
-    if (currentPolyline) {
-      if (Array.isArray(currentPolyline)) {
-        currentPolyline.forEach(poly => poly.setMap(null));
-      } else {
-        currentPolyline.setMap(null);
-      }
+  function drawPathOnMap(routeIndex) {
+    const route = routeDataStore[routeIndex];
+    if (!route) {
+      console.error('Rota verisi bulunamadı:', routeIndex);
+      showErrorPopup('Rota verisi bulunamadı.');
+      return;
     }
 
-    const route = data.routes[routeIndex];
+    if (!map) {
+      console.error('Map is not initialized yet.');
+      showErrorPopup('Harita yüklenemedi, lütfen sayfayı yenileyin.');
+      return;
+    }
+
+    // Önceki çizimi temizle
+    if (currentPolyline.length > 0) {
+      currentPolyline.forEach(poly => poly.setMap(null));
+      currentPolyline = [];
+    }
+
+    if (!route.path || !Array.isArray(route.path) || route.path.length < 2) {
+      console.error('Geçersiz veya yetersiz yol verisi:', route.path);
+      showErrorPopup('Rota çizimi için yeterli veri yok.');
+      return;
+    }
+
     const pathCoordinates = route.path.map(segment => {
       const type = Object.keys(segment)[0];
       const coords = segment[type];
+      if (!coords || coords.length !== 2) {
+        console.error('Geçersiz koordinatlar:', segment);
+        return null;
+      }
       return { lat: coords[0], lng: coords[1] };
-    });
+    }).filter(coord => coord !== null);
+
+    if (pathCoordinates.length < 2) {
+      console.error('Yeterli koordinat bulunamadı:', pathCoordinates);
+      showErrorPopup('Rota çizimi için yeterli koordinat yok.');
+      return;
+    }
 
     const strokeColor = determineRouteColor(route);
-    currentPolyline = [];
 
     for (let i = 0; i < pathCoordinates.length - 1; i++) {
       const segmentPath = [
@@ -833,7 +1021,6 @@
       const infoWindow = new google.maps.InfoWindow({
         content: `
           <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
-            <p><strong>Rota ${routeIndex + 1}</strong></p>
             <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Segment ${i + 1}</h4>
             <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
             <p><strong>Başlangıç:</strong> ${startCoords[0].toFixed(6)}, ${startCoords[1].toFixed(6)}</p>
@@ -859,74 +1046,17 @@
     map.fitBounds(bounds);
   }
 
-  function showRouteInfo(data, requestData, selectedRouteIndex = null) {
+  function drawPathAndShowDetails(routeIndex, type) {
+    console.log('Drawing route for index:', routeIndex, 'Type:', type);
+    drawPathOnMap(routeIndex);
+    showRouteDetailsPopup(routeIndex, type);
+  }
+
+  function showRouteInfo(data, requestData) {
     const passengerType = requestData.passengers.type;
     const nameSurname = requestData.passengers.nameSurname;
     const paymentType = requestData.payment_method.type;
     const paymentMethod = requestData.payment_method;
-
-    function getTransportIcon(route) {
-      const transportTypes = route.path.map(segment => Object.keys(segment)[0]);
-      const uniqueTypes = [...new Set(transportTypes)];
-      return uniqueTypes.map(type => {
-        switch(type) {
-          case 'walk': return '🚶';
-          case 'bus': return '🚌';
-          case 'tram': return '🚊';
-          case 'taxi': return '🚕';
-          default: return '🛣️';
-        }
-      }).join(' ');
-    }
-
-    let routesHtml = '';
-    let detailedRouteInfo = '';
-
-    if (selectedRouteIndex === null) {
-      routesHtml = data.routes.map((route, index) => `
-        <div class="route-card route-selector" onclick="showRouteInfo(allRoutesData, requestDataGlobal, ${index})" data-route-index="${index}">
-          <p><strong>Rota ${index + 1} ${getTransportIcon(route)}</strong></p>
-          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-          <p><strong>Süre:</strong> ${route.time} dk</p>
-          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-          <p><strong>En İyi:</strong> ${route.bestFor}</p>
-        </div>
-      `).join('');
-    } else {
-      const route = data.routes[selectedRouteIndex];
-      routesHtml = data.routes.map((route, index) => `
-        <div class="route-card route-selector ${index === selectedRouteIndex ? 'bg-blue-100 dark:bg-gray-700' : ''}"
-             onclick="showRouteInfo(allRoutesData, requestDataGlobal, ${index})"
-             data-route-index="${index}">
-          <p><strong>Rota ${index + 1} ${getTransportIcon(route)}</strong></p>
-          <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-          <p><strong>Süre:</strong> ${route.time} dk</p>
-          <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-          <p><strong>En İyi:</strong> ${route.bestFor}</p>
-        </div>
-      `).join('');
-
-      detailedRouteInfo = route.path.map((segment, index) => {
-        const transportType = Object.keys(segment)[0];
-        const coords = segment[transportType];
-        let transportIcon = '';
-        switch(transportType) {
-          case 'walk': transportIcon = '🚶'; break;
-          case 'bus': transportIcon = '🚌'; break;
-          case 'tram': transportIcon = '🚊'; break;
-          case 'taxi': transportIcon = '🚕'; break;
-          default: transportIcon = '🛣️';
-        }
-        return `
-          <div class="route-card mb-2">
-            <p><strong>${transportIcon} ${transportType.toUpperCase()} - Segment ${index + 1}</strong></p>
-            <p><strong>Koordinatlar:</strong> ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}</p>
-            <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
-          </div>
-        `;
-      }).join('');
-      drawPathOnMap(data, selectedRouteIndex);
-    }
 
     let passengerDisplay = `
       <div class="route-card">
@@ -964,28 +1094,61 @@
       `;
     }
 
+    routeDataStore = []; // Rota verilerini sıfırla
+    let routesHtml = '';
+    let globalRouteIndex = 0;
+
+    Object.keys(data).forEach((type, typeIndex) => {
+      const routes = data[type];
+      routesHtml += `
+        <div class="transport-type" onclick="toggleRoutes(${typeIndex})">
+          <p>${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+        </div>
+        <div id="routes-${typeIndex}" class="route-list">
+          ${routes.map((route, routeIndex) => {
+        routeDataStore[globalRouteIndex] = route; // Rota verisini global diziye ekle
+        const currentIndex = globalRouteIndex;
+        globalRouteIndex++;
+        return `
+              <div class="route-card" onclick="drawPathAndShowDetails(${currentIndex}, '${type}')">
+                <p><strong>Rota ${routeIndex + 1}</strong></p>
+                <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+                <p><strong>Süre:</strong> ${route.time} dk</p>
+                <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+                <p><strong>En İyi:</strong> ${route.bestFor}</p>
+              </div>
+            `;
+      }).join('')}
+        </div>
+      `;
+    });
+
     document.getElementById('routeInfo').innerHTML = `
       <h2 class="text-2xl font-bold mb-4 text-center">Rota Bilgileri</h2>
       ${passengerDisplay}
       ${paymentDisplay}
       <h4 class="mt-4 font-semibold text-center text-xl">Rotalar</h4>
-      <div class="flex">
-        <div class="w-1/3">
-          ${routesHtml}
-        </div>
-        <div class="w-2/3 pl-4">
-          ${detailedRouteInfo ? `
-            <h4 class="text-lg font-semibold mb-2">Rota ${selectedRouteIndex + 1} Detayları</h4>
-            ${detailedRouteInfo}
-          ` : ''}
-        </div>
-      </div>
+      ${routesHtml}
     `;
 
     document.getElementById('routeInfo').scrollIntoView({ behavior: 'smooth' });
 
-    if (selectedRouteIndex === null) {
-      drawPathOnMap(data, 0);
+    if (routeDataStore.length > 0) {
+      const firstType = Object.keys(data)[0];
+      drawPathAndShowDetails(0, firstType);
+    }
+  }
+
+  function toggleRoutes(typeIndex) {
+    const routeList = document.getElementById(`routes-${typeIndex}`);
+    const isShown = routeList.classList.contains('show');
+
+    document.querySelectorAll('.route-list').forEach(list => {
+      list.classList.remove('show');
+    });
+
+    if (!isShown) {
+      routeList.classList.add('show');
     }
   }
 </script>

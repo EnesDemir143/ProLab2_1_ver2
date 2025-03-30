@@ -4,13 +4,11 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controll
  import org.springframework.beans.factory.annotation.Qualifier;
  import org.springframework.stereotype.Service;
  import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
- import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.NearestStations.Distances;
 
  import java.awt.geom.Point2D;
  import java.util.AbstractMap;
- import java.util.Map;
 
- @Service
+@Service
  public class WalkingController extends Controllers implements WalkingControllerService {
      private static final Double MAX_WALKING_DISTANCE = 3.0;
 

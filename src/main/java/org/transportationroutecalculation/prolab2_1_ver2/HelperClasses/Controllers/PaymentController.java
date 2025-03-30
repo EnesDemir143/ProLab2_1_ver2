@@ -1,13 +1,11 @@
 package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
+import org.transportationroutecalculation.prolab2_1_ver2.Payment.PaymentMethods;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -28,7 +26,7 @@ public class PaymentController extends Controllers{
         List<Route> mutableRouteList = new ArrayList<>(routeList);
         List<Route> routesToRemove = new ArrayList<>();
 
-        double money = passenger.getMoney();
+        double money = passenger.getPaymentMethod().map(PaymentMethods::getMoney).orElse(0.0);
 
         for (Route route : mutableRouteList) {
             if (money < 0) {

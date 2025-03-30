@@ -36,15 +36,6 @@ public abstract class Passengers {
         this.nameSurname = nameSurname;
     }
 
-    public double getMoney() {
-        return paymentMethod
-                .map(pm -> {
-                    PassengersFunctions function = PassengersFunctions.valueOf(pm.getClass().getSimpleName().toUpperCase());
-                    Number result = (Number) function.getFunction().apply(pm);
-                    return result.doubleValue();
-                })
-                .orElse(0.0);
-    }
     public Optional<PaymentMethods> getPaymentMethod() {
         return paymentMethod;
     }
