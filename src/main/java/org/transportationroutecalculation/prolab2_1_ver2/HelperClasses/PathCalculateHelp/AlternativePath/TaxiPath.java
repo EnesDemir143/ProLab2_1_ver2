@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.DistanceCalculate.DistanceCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativeTimeCalculate.TaxiTimeCalculator;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Qualifier("taxi")

@@ -1,4 +1,4 @@
-package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords;
+package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses;
 
 import java.util.Deque;
 import java.util.Map;

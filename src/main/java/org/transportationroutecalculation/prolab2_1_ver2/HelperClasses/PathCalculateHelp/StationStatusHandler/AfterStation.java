@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.JsonLoadService;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.WalkingControllerService;

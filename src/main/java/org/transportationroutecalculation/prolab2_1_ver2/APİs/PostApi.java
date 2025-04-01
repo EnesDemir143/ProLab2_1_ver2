@@ -5,7 +5,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.PostMapping;
     import org.springframework.web.bind.annotation.RequestBody;
     import org.springframework.web.bind.annotation.RestController;
-    import org.transportationroutecalculation.prolab2_1_ver2.APİs.DrawRoute.DrawRoute;
+    import org.transportationroutecalculation.prolab2_1_ver2.APİs.DrawRoute.DrawRoutes;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
     import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PassengerController;
@@ -19,12 +19,12 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     public class PostApi {
 
         private HashMap<String ,RequestData> requestDataList = new HashMap<>();
-        private DrawRoute drawRoute;
+        private DrawRoutes drawRoutes;
         private final PaymentService paymentService;
 
         @Autowired
-        public PostApi(DrawRoute drawRoute, PaymentService paymentService) {
-            this.drawRoute = drawRoute;
+        public PostApi(DrawRoutes drawRoutes, PaymentService paymentService) {
+            this.drawRoutes = drawRoutes;
             this.paymentService = paymentService;
         }
 
@@ -37,7 +37,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
                 requestDataList.put(data.getPassenger().map(Passengers::getNameSurname).orElse(" "), data);
 
-                HashMap<String, List<Route2>> backEndReturn = drawRoute.drawRoute(data);
+                HashMap<String, List<Route2>> backEndReturn = drawRoutes.drawRoute(data);
 
                 return ResponseEntity.ok(backEndReturn);
 

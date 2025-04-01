@@ -1,6 +1,7 @@
-package org.transportationroutecalculation.prolab2_1_ver2.DataLoad;
+package org.transportationroutecalculation.prolab2_1_ver2.DataLoad.RelationShipsBetweenStations;
 
 import org.springframework.stereotype.Component;
+import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.NextStation;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 

@@ -2,10 +2,8 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 

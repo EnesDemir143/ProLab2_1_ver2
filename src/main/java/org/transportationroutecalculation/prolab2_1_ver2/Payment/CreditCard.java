@@ -29,7 +29,7 @@ public class CreditCard extends PaymentMethods{
             System.out.println("Not enough limit");
             return 0;
         } else {
-            limit -= price;
+            limit -= (int) price;
             return limit;
         }
     }

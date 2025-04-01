@@ -10,7 +10,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPath
 import java.util.*;
 
 @Service
-public class DrawNormalRoutes {
+public class DrawNormalRoutes implements DrawRoute {
 
     private final PathCalculate pathCalculate;
 
@@ -19,8 +19,8 @@ public class DrawNormalRoutes {
         this.pathCalculate = pathCalculate;
     }
 
-
-    public void calculateStandardRoutes(RequestData data, HashMap<String, List<Route2>> routeResult) {
+    @Override
+    public void drawRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
         for (PathType pathType : PathType.values()) {
             String pathTypeName = pathType.name().toLowerCase(Locale.ROOT);
             HashMap<String, List<Route2>> calculatedRoutes = pathCalculate.path_calculate(data, pathTypeName);

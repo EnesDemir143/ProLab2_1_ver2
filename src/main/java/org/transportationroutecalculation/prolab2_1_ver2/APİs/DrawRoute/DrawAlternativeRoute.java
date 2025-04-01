@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePathFactory;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteBuilder;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class DrawAlternativeRoute {
+public class DrawAlternativeRoute implements DrawRoute{
 
     private final AlternativePathFactory alternativePathFactory;
 
@@ -24,7 +24,8 @@ public class DrawAlternativeRoute {
         this.alternativePathFactory = alternativePathFactory;
     }
 
-    public void addAlternativeRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
+    @Override
+    public void drawRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
 
         Map<String, AlternativePath> strategies = alternativePathFactory.getAllStrategies();
 
