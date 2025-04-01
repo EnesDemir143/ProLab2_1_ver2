@@ -26,8 +26,8 @@ public class PathCalculate {
 
 
     public HashMap<String, List<Route2>> path_calculate(@RequestBody RequestData frontend_data, String type){
-
         HashMap<String, List<Route2>> backEndReturn;
+
         Stations startStation = findNearestStation.find_nearest_station(frontend_data.getCurrentLocation()).stream()
                 .filter(x -> "notype".equals(type) || x.stations().getStationType().equals(type))
                 .findFirst()

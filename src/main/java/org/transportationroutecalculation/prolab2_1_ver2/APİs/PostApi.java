@@ -20,12 +20,10 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
         private HashMap<String ,RequestData> requestDataList = new HashMap<>();
         private DrawRoutes drawRoutes;
-        private final PaymentService paymentService;
 
         @Autowired
-        public PostApi(DrawRoutes drawRoutes, PaymentService paymentService) {
+        public PostApi(DrawRoutes drawRoutes) {
             this.drawRoutes = drawRoutes;
-            this.paymentService = paymentService;
         }
 
 
