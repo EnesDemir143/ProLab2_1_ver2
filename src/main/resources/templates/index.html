@@ -966,7 +966,6 @@
       return '#8B5CF6';
     }
   }
-
   function drawPathOnMap(routeIndex) {
     const route = routeDataStore[routeIndex];
     if (!route) {
@@ -1000,7 +999,7 @@
         console.error('Geçersiz koordinatlar:', segment);
         return null;
       }
-      return { lat: coords[0], lng: coords[1] };
+      return { lat: coords[0], lng: coords[1], type: type }; // Tür bilgisini ekle
     }).filter(coord => coord !== null);
 
     if (pathCoordinates.length < 2) {
@@ -1009,13 +1008,62 @@
       return;
     }
 
-    const strokeColor = determineRouteColor(route);
-
     for (let i = 0; i < pathCoordinates.length - 1; i++) {
       const segmentPath = [
         pathCoordinates[i],
         pathCoordinates[i + 1]
       ];
+
+      const startType = pathCoordinates[i].type; // Başlangıç noktası türü
+      const endType = pathCoordinates[i + 1].type; // Bitiş noktası türü
+      const segmentType = Object.keys(route.path[i])[0]; // Segmentin kendi türü
+
+      // Renk ve transfer durumunu belirle
+      let strokeColor;
+      let isTransfer = false;
+
+      // Başlangıç veya bitişte "walk" veya "taxi" varsa doğrudan renk ataması
+      if (i === 0 || i === pathCoordinates.length - 2) { // Başlangıç veya son segment
+        if (startType === 'walk' || endType === 'walk') {
+          strokeColor = '#EF4444'; // Kırmızı (walk için)
+        } else if (startType === 'taxi' || endType === 'taxi') {
+          strokeColor = '#F59E0B'; // Sarı (taxi için)
+        } else {
+          // "Walk" ve "taxi" değilse, normal kurallar uygulanır
+          if (segmentType === 'walk') {
+            strokeColor = '#EF4444'; // Kırmızı (walk için)
+          } else if (segmentType === 'taxi') {
+            strokeColor = '#F59E0B'; // Sarı (taxi için)
+          } else if (segmentType === 'bus' || segmentType === 'tram') {
+            // "Bus" veya "tram" için transfer kontrolü
+            if (startType !== endType) {
+              isTransfer = true; // Farklı türler arasında geçiş varsa transfer
+              strokeColor = '#FFC0CB'; // Turuncu (transfer için)
+            } else {
+              strokeColor = '#10B981'; // Yeşil (sadece bus veya tram için)
+            }
+          } else {
+            strokeColor = '#8B5CF6'; // Varsayılan renk
+          }
+        }
+      } else {
+        // Orta segmentler için normal kurallar
+        if (segmentType === 'walk') {
+          strokeColor = '#EF4444'; // Kırmızı (walk için)
+        } else if (segmentType === 'taxi') {
+          strokeColor = '#F59E0B'; // Sarı (taxi için)
+        } else if (segmentType === 'bus' || segmentType === 'tram') {
+          // "Bus" veya "tram" için transfer kontrolü
+          if (startType !== endType) {
+            isTransfer = true; // Farklı türler arasında geçiş varsa transfer
+            strokeColor = '#FFC0CB'; // Turuncu (transfer için)
+          } else {
+            strokeColor = '#10B981'; // Yeşil (sadece bus veya tram için)
+          }
+        } else {
+          strokeColor = '#8B5CF6'; // Varsayılan renk
+        }
+      }
 
       const segmentPolyline = new google.maps.Polyline({
         path: segmentPath,
@@ -1028,19 +1076,31 @@
 
       currentPolyline.push(segmentPolyline);
 
-      const transportType = Object.keys(route.path[i])[0];
-      const startCoords = route.path[i][transportType];
-      const endCoords = route.path[i + 1] ? route.path[i + 1][Object.keys(route.path[i + 1])[0]] : startCoords;
+      const startCoords = route.path[i][startType];
+      const endCoords = route.path[i + 1][endType];
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
+      // Info window içeriği
+      let infoContent = `
+        <div style="font-family: 'Poppins', sans-serif; color: #333; padding: 5px;">
             <h4 style="font-weight: 600; margin-bottom: 5px; color: ${strokeColor};">Segment ${i + 1}</h4>
-            <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+            <p><strong>Segment Türü:</strong> ${segmentType}</p>
+            <p><strong>Başlangıç Türü:</strong> ${startType}</p>
+            <p><strong>Bitiş Türü:</strong> ${endType}</p>
+      `;
+
+      // Transfer durumu varsa ekle
+      if (isTransfer) {
+        infoContent += '<p><strong>Durum:</strong> Transfer</p>';
+      }
+
+      infoContent += `
             <p><strong>Başlangıç:</strong> ${startCoords[0].toFixed(6)}, ${startCoords[1].toFixed(6)}</p>
             <p><strong>Bitiş:</strong> ${endCoords[0].toFixed(6)}, ${endCoords[1].toFixed(6)}</p>
-          </div>
-        `
+        </div>
+      `;
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: infoContent
       });
 
       google.maps.event.addListener(segmentPolyline, 'mouseover', function(event) {
