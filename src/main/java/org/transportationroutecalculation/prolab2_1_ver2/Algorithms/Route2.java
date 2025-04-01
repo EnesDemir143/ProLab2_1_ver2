@@ -10,13 +10,23 @@ public class Route2 {
     private int time;
     private double amount;
     private String bestFor;
+    private double remainMoney;
 
-    public Route2(Deque<Map.Entry<String, double[]>> path, double distance, int time, double amount, String bestFor) {
+    public Route2(Deque<Map.Entry<String, double[]>> path, double distance, int time, double amount, String bestFor, double remainMoney) {
         this.path = path;
         this.distance = distance;
         this.time = time;
         this.amount = amount;
         this.bestFor = bestFor;
+        this.remainMoney = remainMoney;
+    }
+
+    public double getRemainMoney() {
+        return remainMoney;
+    }
+
+    public void setRemainMoney(double remainMoney) {
+        this.remainMoney = remainMoney;
     }
 
     public Deque<Map.Entry<String, double[]>> getPath() {

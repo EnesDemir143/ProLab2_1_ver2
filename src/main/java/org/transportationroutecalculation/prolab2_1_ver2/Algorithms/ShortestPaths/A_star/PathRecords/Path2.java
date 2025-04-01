@@ -10,6 +10,7 @@ public class Path2 {
     private int time;
     private double amount;
     private String best_for;
+    private double remainMoney;
 
     public Path2(Deque<Map.Entry<String, double[]>> path, double distance, int time, double amount, String best_for) {
         this.path = path;
@@ -17,6 +18,15 @@ public class Path2 {
         this.time = time;
         this.amount = amount;
         this.best_for = best_for;
+        this.remainMoney = -1;
+    }
+
+    public double getRemainMoney() {
+        return remainMoney;
+    }
+
+    public void setRemainMoney(double remainMoney) {
+        this.remainMoney = remainMoney;
     }
 
     public String getBest_for() {

@@ -813,7 +813,7 @@
       }).join(' ');
     }
 
-    // Detailed segment info
+    // Detailed segment info with response data
     const detailedRouteInfo = route.path.map((segment, index) => {
       const transportType = Object.keys(segment)[0];
       const coords = segment[transportType];
@@ -826,28 +826,30 @@
         default: transportIcon = '🛣️';
       }
       return `
-      <div class="route-card mb-2">
-        <p><strong>${transportIcon} ${transportType.toUpperCase()} - Segment ${index + 1}</strong></p>
-        <p><strong>Koordinatlar:</strong> ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}</p>
-        <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
-      </div>
-    `;
+            <div class="route-card mb-2">
+                <p><strong>${transportIcon} ${transportType.toUpperCase()} - Segment ${index + 1}</strong></p>
+                <p><strong>Koordinatlar:</strong> ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}</p>
+                <p><strong>Ulaşım Türü:</strong> ${transportType}</p>
+            </div>
+        `;
     }).join('');
 
+    // Pop-up içeriği
     popup.innerHTML = `
-    <h3 class="text-lg font-semibold mb-2">${type.toUpperCase()} - Rota ${routeIndex + 1} ${getTransportIcon(route)}</h3>
-    <div class="space-y-2">
-      <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
-      <p><strong>Süre:</strong> ${route.time} dk</p>
-      <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
-      <p><strong>En İyi:</strong> ${route.bestFor}</p>
-    </div>
-    <h4 class="text-md font-semibold mt-4 mb-2">Rota Detayları</h4>
-    <div class="max-h-60 overflow-y-auto">
-      ${detailedRouteInfo}
-    </div>
-    <button onclick="closePopup()" class="btn-draw w-full text-white p-3 font-semibold text-base mt-4">Kapat</button>
-  `;
+        <h3 class="text-lg font-semibold mb-2">${type.toUpperCase()} - Rota ${routeIndex + 1} ${getTransportIcon(route)}</h3>
+        <div class="space-y-2">
+            <p><strong>Mesafe:</strong> ${route.distance.toFixed(1)} km</p>
+            <p><strong>Süre:</strong> ${route.time} dk</p>
+            <p><strong>Tutar:</strong> ${route.amount.toFixed(1)} TL</p>
+            <p><strong>En İyi:</strong> ${route.bestFor}</p>
+            <p><strong>Kalan Para:</strong> ${route.remainMoney.toFixed(1)} TL</p>
+        </div>
+        <h4 class="text-md font-semibold mt-4 mb-2">Rota Detayları</h4>
+        <div class="max-h-60 overflow-y-auto">
+            ${detailedRouteInfo}
+        </div>
+        <button onclick="closePopup()" class="btn-draw w-full text-white p-3 font-semibold text-base mt-4">Kapat</button>
+    `;
 
     popup.classList.add('show');
     overlay.classList.add('show');

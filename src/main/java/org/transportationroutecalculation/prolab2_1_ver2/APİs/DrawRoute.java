@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.PathCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.AlternativePathType;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteBuilder;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteConcat;
+import org.transportationroutecalculation.prolab2_1_ver2.Payment.PaymentMethods;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,9 +48,16 @@ public class DrawRoute {
             for (Map.Entry<String, List<Route2>> entry : calculatedRoutes.entrySet()) {
                 routeResult.putIfAbsent(pathTypeName, new ArrayList<>());
 
+                double remainMoney = data.getPaymentMethod()
+                        .map(paymentMethod -> paymentMethod.pay(entry.getValue().getFirst().getAmount()))
+                        .orElse(0.0);
+
+                entry.getValue().getFirst().setRemainMoney(remainMoney);
+
                 List<Route2> currentList = routeResult.get(pathTypeName);
 
                 currentList.addAll(entry.getValue());
+
             }
         }
     }
@@ -56,7 +65,17 @@ public class DrawRoute {
     private void addAlternativeRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
         routeResult.putIfAbsent(ALTERNATIVE_ROUTE_KEY, new ArrayList<>());
 
-        Route2 alternativeRoute = RouteBuilder.buildFromPath(routeConcat.calculateAlternativePath(data));
-        routeResult.get(ALTERNATIVE_ROUTE_KEY).add(alternativeRoute);
+        for (AlternativePathType alternativePathType : AlternativePathType.values()) {
+            String alternativePathTypeName = alternativePathType.name().toLowerCase(Locale.ROOT);
+
+            Route2 alternativeRoute = RouteBuilder.buildFromPath(routeConcat.calculateAlternativePath(data));
+
+            double remainMoney = data.getPaymentMethod()
+                    .map(paymentMethod -> paymentMethod.pay(alternativeRoute.getAmount()))
+                    .orElse(0.0);
+            alternativeRoute.setRemainMoney(remainMoney);
+            routeResult.get(alternativePathTypeName).add(alternativeRoute);
+
+        }
     }
 }

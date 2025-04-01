@@ -12,7 +12,8 @@ public class RouteBuilder {
                 path.getDistance(),
                 path.getTime(),
                 path.getAmount(),
-                path.getBest_for()
+                path.getBest_for(),
+                path.getRemainMoney()
         );
     }
 }

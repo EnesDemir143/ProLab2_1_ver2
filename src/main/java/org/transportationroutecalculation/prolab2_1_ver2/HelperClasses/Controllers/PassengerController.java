@@ -5,15 +5,15 @@ import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.
 
 import java.util.HashMap;
 
-public class PassengetController extends Controllers{
+public class PassengerController extends Controllers{
 
-    public PassengetController(){
+    public PassengerController(){
         super();
     }
 
     public RequestData passengerControl(HashMap<String ,RequestData> frontend_data, RequestData data){
 
-        if (frontend_data.keySet().contains(data.getPassenger().map(Passengers::getNameSurname).orElse(" "))){
+        if (frontend_data.containsKey(data.getPassenger().map(Passengers::getNameSurname).orElse(" "))){
             return frontend_data.get(data.getPassenger().map(Passengers::getNameSurname).orElse(" "));
         }
         else{

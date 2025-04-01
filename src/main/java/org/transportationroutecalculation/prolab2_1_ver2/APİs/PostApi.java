@@ -7,6 +7,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.RestController;
     import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
     import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
+    import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PassengerController;
 
 
     import java.security.Principal;
@@ -31,13 +32,11 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
         public ResponseEntity<HashMap <String, List<Route2>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
 
-               // data = new PassengetController().passengerControl(requestDataList, data);
+                data = new PassengerController().passengerControl(requestDataList, data);
 
                 requestDataList.put(data.getPassenger().map(Passengers::getNameSurname).orElse(" "), data);
 
                 HashMap<String, List<Route2>> backEndReturn = drawRoute.drawRoute(data);
-
-                //backEndReturn = paymentService.processPayment(data, backEndReturn);
 
                 return ResponseEntity.ok(backEndReturn);
 
