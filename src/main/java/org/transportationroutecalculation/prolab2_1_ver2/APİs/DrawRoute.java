@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.PathCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.AlternativePathType;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePathFactory;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteBuilder;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.RouteProcess.RouteConcat;
 import org.transportationroutecalculation.prolab2_1_ver2.Payment.PaymentMethods;
@@ -22,12 +25,13 @@ public class DrawRoute {
 
     private final RouteConcat routeConcat;
     private final PathCalculate pathCalculate;
-    private static final String ALTERNATIVE_ROUTE_KEY = "alternative";
+    private AlternativePathFactory alternativePathFactory;
 
     @Autowired
-    public DrawRoute(RouteConcat routeConcat, PathCalculate pathCalculate) {
+    public DrawRoute(RouteConcat routeConcat, PathCalculate pathCalculate, AlternativePathFactory alternativePathFactory) {
         this.routeConcat = routeConcat;
         this.pathCalculate = pathCalculate;
+        this.alternativePathFactory = alternativePathFactory;
     }
 
     public HashMap<String, List<Route2>> drawRoute(@RequestBody RequestData data) {
@@ -63,19 +67,24 @@ public class DrawRoute {
     }
 
     private void addAlternativeRoute(RequestData data, HashMap<String, List<Route2>> routeResult) {
-        routeResult.putIfAbsent(ALTERNATIVE_ROUTE_KEY, new ArrayList<>());
 
-        for (AlternativePathType alternativePathType : AlternativePathType.values()) {
-            String alternativePathTypeName = alternativePathType.name().toLowerCase(Locale.ROOT);
+        Map<String, AlternativePath> strategies = alternativePathFactory.getAllStrategies();
 
-            Route2 alternativeRoute = RouteBuilder.buildFromPath(routeConcat.calculateAlternativePath(data));
+        for (Map.Entry<String, AlternativePath> entry : strategies.entrySet()) {
+            String alternativePathTypeName = entry.getKey();
+            AlternativePath alternativePath = entry.getValue();
+
+            routeResult.putIfAbsent(alternativePathTypeName, new ArrayList<>());
+            Path2 calculatedPath = alternativePath.calculatePath(data);
+
+            Route2 alternativeRoute = RouteBuilder.buildFromPath(calculatedPath);
 
             double remainMoney = data.getPaymentMethod()
                     .map(paymentMethod -> paymentMethod.pay(alternativeRoute.getAmount()))
                     .orElse(0.0);
             alternativeRoute.setRemainMoney(remainMoney);
-            routeResult.get(alternativePathTypeName).add(alternativeRoute);
 
+            routeResult.get(alternativePathTypeName).add(alternativeRoute);
         }
     }
 }

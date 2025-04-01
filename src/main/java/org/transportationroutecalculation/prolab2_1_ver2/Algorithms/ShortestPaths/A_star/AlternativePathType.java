@@ -1,5 +1,8 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star;
 
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
+import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.TaxiPath;
+
 public enum AlternativePathType {
 
     TAXI("taxi");

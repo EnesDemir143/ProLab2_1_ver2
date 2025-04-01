@@ -27,9 +27,4 @@ public class RouteConcat {
     public HashMap<String, List<Route2>> route_concat(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
         return routeManager.createRoutes(frontend_data, startStation, endStation, type);
     }
-
-    public Path2 calculateAlternativePath(@RequestBody RequestData frontend_data) {
-        return alternativePath.calculatePath(frontend_data);
-    }
-
 }

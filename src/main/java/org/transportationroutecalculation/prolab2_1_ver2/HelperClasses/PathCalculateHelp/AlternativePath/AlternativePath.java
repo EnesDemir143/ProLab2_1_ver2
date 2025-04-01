@@ -3,7 +3,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathRecords.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.DataLoad.Data;
@@ -22,7 +21,7 @@ public abstract class AlternativePath {
         this.data = jsonLoadService.getData();
     }
 
-    public abstract Path2 calculatePath(@RequestBody RequestData frontend_data);
+    public abstract Path2 calculatePath(RequestData frontend_data);
 
     public DistanceCalculate getDistanceCalculate() {
         return distanceCalculate;
