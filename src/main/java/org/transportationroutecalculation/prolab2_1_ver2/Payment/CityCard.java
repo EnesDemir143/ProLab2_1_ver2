@@ -6,7 +6,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import java.util.HashMap;
 import java.util.List;
 
-public class CityCard extends PaymentMethods implements PaymentCalculate{
+public class CityCard extends PaymentMethods {
 
     @JsonProperty("balance")
     private double balance;
@@ -20,6 +20,17 @@ public class CityCard extends PaymentMethods implements PaymentCalculate{
     @Override
     public double getMoney() {
        return getBalance();
+    }
+
+    @Override
+    public double pay(double price) {
+        if (price > balance) {
+            System.out.println("Not enough balance");
+            return 0;
+        } else {
+            balance -= price;
+            return balance;
+        }
     }
 
     public CityCard(double balance, double card_number) {
@@ -44,8 +55,4 @@ public class CityCard extends PaymentMethods implements PaymentCalculate{
     }
 
 
-    @Override
-    public double calculateAmount(HashMap<String, List<Route2>> routes) {
-        return 0;
-    }
 }

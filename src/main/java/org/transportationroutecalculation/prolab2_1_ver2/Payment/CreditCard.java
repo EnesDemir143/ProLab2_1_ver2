@@ -6,7 +6,7 @@ import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import java.util.HashMap;
 import java.util.List;
 
-public class CreditCard extends PaymentMethods implements PaymentCalculate{
+public class CreditCard extends PaymentMethods{
 
     @JsonProperty("limit")
     private int limit;
@@ -21,6 +21,17 @@ public class CreditCard extends PaymentMethods implements PaymentCalculate{
     @Override
     public double getMoney() {
         return getLimit();
+    }
+
+    @Override
+    public double pay(double price) {
+        if (price > getLimit()) {
+            System.out.println("Not enough limit");
+            return 0;
+        } else {
+            limit -= price;
+            return limit;
+        }
     }
 
     public CreditCard(int limit, String number) {
@@ -45,8 +56,5 @@ public class CreditCard extends PaymentMethods implements PaymentCalculate{
     }
 
 
-    @Override
-    public double calculateAmount(HashMap<String, List<Route2>> routes) {
-        return 0;
-    }
+
 }

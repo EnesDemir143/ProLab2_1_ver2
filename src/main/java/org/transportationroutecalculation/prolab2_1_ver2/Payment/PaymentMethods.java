@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
         @JsonSubTypes.Type(value = CreditCard.class, name = "creditCard")
 })
 @Service
-public abstract class PaymentMethods implements PaymentCalculate{
+public abstract class PaymentMethods {
 
     public PaymentMethods() {
     }
 
     public abstract double getMoney();
+    public abstract double pay(double price);
 
 }

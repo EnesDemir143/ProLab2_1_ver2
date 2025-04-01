@@ -23,24 +23,7 @@ public class PaymentController extends Controllers{
             return routes;
         }
 
-        List<Route2> mutableRouteList = new ArrayList<>(routeList);
-        List<Route2> routesToRemove = new ArrayList<>();
 
-        double money = passenger.getPaymentMethod().map(PaymentMethods::getMoney).orElse(0.0);
-
-        for (Route2 route : mutableRouteList) {
-            if (money < 0) {
-                return routes;
-            } else if (money < passenger.getDiscountRate()*(route.getAmount())) {
-                routesToRemove.add(route);
-            } else {
-                route.setAmount(passenger.getDiscountRate()*(route.getAmount()));
-                System.out.println("Ödeme başarılı");
-            }
-        }
-
-        mutableRouteList.removeAll(routesToRemove);
-        routes.put("routes", mutableRouteList);
         return routes;
     }
 }

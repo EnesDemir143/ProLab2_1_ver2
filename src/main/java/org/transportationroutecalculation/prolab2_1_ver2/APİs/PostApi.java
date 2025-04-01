@@ -37,7 +37,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
                 HashMap<String, List<Route2>> backEndReturn = drawRoute.drawRoute(data);
 
-                backEndReturn = paymentService.processPayment(data, backEndReturn);
+                //backEndReturn = paymentService.processPayment(data, backEndReturn);
 
                 return ResponseEntity.ok(backEndReturn);
 
