@@ -33,8 +33,6 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
                 data = new PassengerController().passengerControl(requestDataList, data);
 
-                requestDataList.put(data.getPassenger().map(Passengers::getNameSurname).orElse(" "), data);
-
                 HashMap<String, List<Route2>> backEndReturn = drawRoutes.drawRoute(data);
 
                 return ResponseEntity.ok(backEndReturn);
