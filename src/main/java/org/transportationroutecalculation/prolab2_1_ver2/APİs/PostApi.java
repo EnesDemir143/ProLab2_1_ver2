@@ -6,7 +6,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
     import org.springframework.web.bind.annotation.RequestBody;
     import org.springframework.web.bind.annotation.RestController;
     import org.transportationroutecalculation.prolab2_1_ver2.APİs.DrawRoute.DrawRoutes;
-    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
+    import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
     import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
     import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.Controllers.PassengerController;
 
@@ -28,12 +28,12 @@ package org.transportationroutecalculation.prolab2_1_ver2.APİs;
 
 
         @PostMapping("/api/draw_route")
-        public ResponseEntity<HashMap <String, List<Route2>>> drawRoute(@RequestBody RequestData data, Principal principal) {
+        public ResponseEntity<HashMap <String, List<Path2>>> drawRoute(@RequestBody RequestData data, Principal principal) {
             try {
 
                 data = new PassengerController().passengerControl(requestDataList, data);
 
-                HashMap<String, List<Route2>> backEndReturn = drawRoutes.drawRoute(data);
+                HashMap<String, List<Path2>> backEndReturn = drawRoutes.drawRoute(data);
 
                 return ResponseEntity.ok(backEndReturn);
 

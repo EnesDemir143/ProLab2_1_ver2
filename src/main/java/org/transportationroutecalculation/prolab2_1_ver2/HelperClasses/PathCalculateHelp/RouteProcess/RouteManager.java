@@ -3,12 +3,12 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.Metric;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.StationStatusHandler.AfterStation;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.StationStatusHandler.BeforeStation;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
 import java.util.ArrayList;
@@ -31,27 +31,29 @@ public class RouteManager {
         this.alternativePath = alternativePath;
     }
 
-    public HashMap<String, List<Route2>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
-        HashMap<String, List<Route2>> backEndReturn = new HashMap<>();
+    public HashMap<String, List<Path2>> createRoutes(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
+        HashMap<String, List<Path2>> backEndReturn = new HashMap<>();
         List<Path2> paths = new ArrayList<>();
-        List<Route2> routes = new ArrayList<>();
 
         for (Metric metric : Metric.values()) {
-            paths.add(pathFactory.createPath(startStation, endStation, metric, type));
-        }
-
-        for (Path2 path : paths) {
+            System.out.println("RouteManager: Metric: " + metric);
+            Path2 path = pathFactory.createPath(startStation, endStation, metric, type);
             if (path == null) {
                 System.err.println("RouteManager: Path not found!");
                 return null;
             }
+            double amount = frontend_data.getPaymentMethod()
+                    .map(paymentMethod -> paymentMethod.calculateAmount(path.getAmount(), frontend_data.getPassenger().map(Passengers::getDiscountRate).orElse(1.0)))
+                    .orElse(path.getAmount());
+            path.setAmount(amount);
+            System.out.println("RouteManager: Path amount: " + path.getAmount());
             beforeStation.processStation(frontend_data, path);
             afterStation.processStation(frontend_data, path);
 
-            routes.add(RouteBuilder.buildFromPath(path));
+            paths.add(path);
         }
 
-        backEndReturn.put("routes", routes);
+        backEndReturn.put("routes", paths);
 
         return backEndReturn;
     }

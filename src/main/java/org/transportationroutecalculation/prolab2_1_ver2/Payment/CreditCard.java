@@ -1,12 +1,12 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class CreditCard extends PaymentMethods{
+public class CreditCard extends PaymentMethods implements CalculateAmount {
 
     @JsonProperty("limit")
     private int limit;
@@ -24,13 +24,12 @@ public class CreditCard extends PaymentMethods{
     }
 
     @Override
-    public double pay(double price) {
+    public double pay(Passengers passenger, double price) {
         if (price > getLimit()) {
             System.out.println("Not enough limit");
             return 0;
         } else {
-            limit -= (int) price;
-            return limit;
+            return limit - price ;
         }
     }
 
@@ -56,5 +55,8 @@ public class CreditCard extends PaymentMethods{
     }
 
 
-
+    @Override
+    public double calculateAmount(double price, double discountRate) {
+        return price * discountRate;
+    }
 }

@@ -3,7 +3,7 @@ package org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
+import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.HelperClasses.PathCalculateHelp.AlternativePath.AlternativePath;
 import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.StationTypes.Stations;
 
@@ -22,7 +22,7 @@ public class RouteConcat {
         this.alternativePath = alternativePath;
     }
 
-    public HashMap<String, List<Route2>> route_concat(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
+    public HashMap<String, List<Path2>> route_concat(RequestData frontend_data, Stations startStation, Stations endStation, String type) {
         return routeManager.createRoutes(frontend_data, startStation, endStation, type);
     }
 }

@@ -1,12 +1,12 @@
 package org.transportationroutecalculation.prolab2_1_ver2.Payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.Route2;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Passengers.Passengers;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class CityCard extends PaymentMethods {
+public class CityCard extends PaymentMethods implements CalculateAmount {
 
     @JsonProperty("balance")
     private double balance;
@@ -23,13 +23,12 @@ public class CityCard extends PaymentMethods {
     }
 
     @Override
-    public double pay(double price) {
+    public double pay(Passengers passenger, double price) {
         if (price > balance) {
             System.out.println("Not enough balance");
             return 0;
         } else {
-            balance -= price;
-            return balance;
+            return balance - price;
         }
     }
 
@@ -55,4 +54,8 @@ public class CityCard extends PaymentMethods {
     }
 
 
+    @Override
+    public double calculateAmount(double price, double discountRate) {
+        return price * discountRate;
+    }
 }
