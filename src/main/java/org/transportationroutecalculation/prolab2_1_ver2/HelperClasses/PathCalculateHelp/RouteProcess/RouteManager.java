@@ -39,21 +39,26 @@ public class RouteManager {
             System.out.println("RouteManager: Metric: " + metric);
             Path2 path = pathFactory.createPath(startStation, endStation, metric, type);
             if (path == null) {
-                System.err.println("RouteManager: Path not found!");
-                return null;
+                System.err.println("RouteManager: Path not found for metric: " + metric);
+                continue;
             }
-            double amount = frontend_data.getPaymentMethod()
-                    .map(paymentMethod -> paymentMethod.calculateAmount(path.getAmount(), frontend_data.getPassenger().map(Passengers::getDiscountRate).orElse(1.0)))
-                    .orElse(path.getAmount());
-            path.setAmount(amount);
-            System.out.println("RouteManager: Path amount: " + path.getAmount());
+
             beforeStation.processStation(frontend_data, path);
             afterStation.processStation(frontend_data, path);
+
+            double originalAmount = path.getAmount();
+            double discountRate = frontend_data.getPassenger().map(Passengers::getDiscountRate).orElse(1.0);
+            double finalAmount = frontend_data.getPaymentMethod()
+                    .map(paymentMethod -> paymentMethod.calculateAmount(originalAmount, discountRate))
+                    .orElse(originalAmount);
+            path.setAmount(finalAmount);
 
             paths.add(path);
         }
 
-        backEndReturn.put("routes", paths);
+        if (!paths.isEmpty()) {
+            backEndReturn.put("routes", paths);
+        }
 
         return backEndReturn;
     }

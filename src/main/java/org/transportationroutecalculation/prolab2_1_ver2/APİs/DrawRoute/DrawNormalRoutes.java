@@ -28,16 +28,17 @@ public class DrawNormalRoutes implements DrawRoute {
             for (Map.Entry<String, List<Path2>> entry : calculatedRoutes.entrySet()) {
                 routeResult.putIfAbsent(pathTypeName, new ArrayList<>());
 
-                double remainMoney = data.getPaymentMethod()
-                        .map(paymentMethod -> paymentMethod.pay(data.getPassenger().orElse(null), entry.getValue().getFirst().getAmount()))
-                        .orElse(0.0);
+                List<Path2> paths = entry.getValue();
+                for (Path2 path : paths) {
+                    double remainMoney = data.getPaymentMethod()
+                            .map(paymentMethod -> paymentMethod.pay(data.getPassenger().orElse(null), path.getAmount()))
+                            .orElse(0.0);
 
-                entry.getValue().getFirst().setRemainMoney(remainMoney);
+                    path.setRemainMoney(remainMoney);
+                }
 
                 List<Path2> currentList = routeResult.get(pathTypeName);
-
-                currentList.addAll(entry.getValue());
-
+                currentList.addAll(paths);
             }
         }
     }
