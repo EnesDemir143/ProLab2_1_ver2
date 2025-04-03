@@ -18,6 +18,8 @@ public abstract class Passengers {
     @JsonProperty("nameSurname")
     private String nameSurname;
 
+    private int enterCount = 0;
+
     private Optional<PaymentMethods> paymentMethod;
 
     public Passengers() {
@@ -42,6 +44,14 @@ public abstract class Passengers {
 
     public void setPaymentMethod(Optional<PaymentMethods> paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public int getEnterCount() {
+        return enterCount;
+    }
+
+    public void setEnterCount() {
+        this.enterCount += 1;
     }
 
     public abstract double getDiscountRate();
