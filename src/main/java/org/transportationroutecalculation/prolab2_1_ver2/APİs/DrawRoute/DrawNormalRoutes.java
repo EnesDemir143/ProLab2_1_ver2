@@ -6,11 +6,12 @@ import org.transportationroutecalculation.prolab2_1_ver2.APİs.RequestData;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.PathCalculate;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathClasses.Path2;
 import org.transportationroutecalculation.prolab2_1_ver2.Algorithms.ShortestPaths.A_star.PathType;
+import org.transportationroutecalculation.prolab2_1_ver2.MainClasses.Locations.TargetLocation;
 
 import java.util.*;
 
 @Service
-public class DrawNormalRoutes implements DrawRoute {
+public class DrawNormalRoutes extends TargetLocation implements DrawRoute {
 
     private final PathCalculate pathCalculate;
 

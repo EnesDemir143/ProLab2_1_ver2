@@ -509,7 +509,7 @@
         <div class="space-y-4">
           <div>
             <button class="marker-btn w-full text-white p-3 font-semibold text-base" onclick="toggleMarker('start')">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s" alt="Start Marker"> Başlangıç Noktası
+              <img src="/images/girispng.png" alt="Start Marker"> Başlangıç Noktası
             </button>
             <div id="start_section" class="dynamic-section mt-2 space-y-2">
               <input type="text" id="start_lat" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Başlangıç Enlem (Lat)">
@@ -519,7 +519,7 @@
 
           <div>
             <button class="marker-btn w-full text-white p-3 font-semibold text-base" onclick="toggleMarker('end')">
-              <img src="https://toppng.com/uploads/preview/finish-line-clip-art-png-11552244506xaumpwxhty.png" alt="End Marker"> Bitiş Noktası
+              <img src="/images/finish.png" alt="End Marker"> Bitiş Noktası
             </button>
             <div id="end_section" class="dynamic-section mt-2 space-y-2">
               <input type="text" id="end_lat" class="input-field w-full p-2 focus:outline-none text-gray-700 night-mode:text-gray-200 placeholder-gray-400 night-mode:placeholder-gray-500 text-sm" placeholder="Bitiş Enlem (Lat)">
@@ -677,7 +677,7 @@
           position: {lat: lat, lng: lon},
           map: map,
           draggable: true,
-          icon: { url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNWKw_BIbAoLRjiMkmz44Op4eanE01y9FXg&s', scaledSize: new google.maps.Size(48, 48) },
+          icon: { url: '/images/girispng.png', scaledSize: new google.maps.Size(48, 48) },
           title: 'Başlangıç Noktası'
         });
 
@@ -696,7 +696,7 @@
           position: {lat: lat, lng: lon},
           map: map,
           draggable: true,
-          icon: { url: 'https://toppng.com/uploads/preview/finish-line-clip-art-png-11552244506xaumpwxhty.png', scaledSize: new google.maps.Size(48, 48) },
+          icon: { url: '/images/finish.png', scaledSize: new google.maps.Size(48, 48) },
           title: 'Hedef Noktası'
         });
 
